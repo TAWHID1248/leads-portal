@@ -29,6 +29,9 @@ DATABASES = {
 # ---------- HTTPS / proxy ----------
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_SSL_REDIRECT = True
+# Railway's internal healthcheck hits the container directly without the
+# X-Forwarded-Proto header, so SECURE_SSL_REDIRECT would 301 it. Exempt /healthz/.
+SECURE_REDIRECT_EXEMPT = [r'^healthz/$']
 SECURE_HSTS_SECONDS = 31536000           # 1 year
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
