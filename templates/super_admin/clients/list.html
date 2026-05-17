@@ -1,0 +1,89 @@
+{% extends 'super_admin/base.html' %}
+{% load portal_tags %}
+
+{% block title %}Clients | LeadPortal{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+        <h1 class="h3 mb-0">Clients</h1>
+        <p class="text-muted small mb-0">{{ total_count }} total</p>
+    </div>
+    <a href="{% url 'super_admin:client_create' %}" class="btn btn-primary btn-sm">
+        <i class="bi bi-plus-circle me-1"></i> New client
+    </a>
+</div>
+
+<form class="card p-3 mb-3" method="get">
+    <div class="row g-2 align-items-end">
+        <div class="col-md-4">
+            <label class="form-label small fw-semibold mb-1">Search</label>
+            <input type="text" name="search" value="{{ search }}"
+                   class="form-control form-control-sm" placeholder="Company or contact">
+        </div>
+        <div class="col-md-3">
+            <label class="form-label small fw-semibold mb-1">Status</label>
+            <select name="status" class="form-select form-select-sm">
+                <option value="">Any</option>
+                {% for v,l in statuses %}
+                <option value="{{ v }}" {% if status == v %}selected{% endif %}>{{ l }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-sm btn-primary w-100">Apply</button>
+        </div>
+        <div class="col-md-2">
+            <a href="{% url 'super_admin:client_list' %}" class="btn btn-sm btn-outline-secondary w-100">Clear</a>
+        </div>
+    </div>
+</form>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0 align-middle">
+            <thead class="small text-muted">
+                <tr>
+                    <th class="ps-3">Company</th>
+                    <th>Contact</th>
+                    <th>Status</th>
+                    <th>Total leads</th>
+                    <th>Active subs</th>
+                    <th>Wallet</th>
+                    <th>Last active</th>
+                    <th class="pe-3"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in clients %}
+                <tr>
+                    <td class="ps-3">
+                        <a href="{% url 'super_admin:client_detail' c.id %}" class="fw-semibold text-decoration-none">
+                            {{ c.company_name }}
+                        </a>
+                    </td>
+                    <td class="small">
+                        {{ c.user.get_full_name|default:c.user.email }}<br>
+                        <span class="text-muted">{{ c.user.email }}</span>
+                    </td>
+                    <td>{% status_badge c.user.status %}</td>
+                    <td>{{ c.leads_count }}</td>
+                    <td>{{ c.active_subs }}</td>
+                    <td>{{ c.wallet.balance|default:0|money }}</td>
+                    <td class="small text-muted">{{ c.user.last_login_at|time_ago|default:"—" }}</td>
+                    <td class="pe-3 text-end">
+                        <a href="{% url 'super_admin:client_detail' c.id %}" class="btn btn-sm btn-link text-secondary">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="8" class="p-0">
+                    {% include 'partials/_empty_state.html' with title="No clients yet" description="Create your first client above." %}
+                </td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

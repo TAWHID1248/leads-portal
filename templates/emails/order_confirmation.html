@@ -1,0 +1,17 @@
+<!doctype html>
+<html><body style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;color:#1e1b2e;line-height:1.5;">
+<div style="max-width:560px;margin:0 auto;padding:24px;">
+    <h2 style="color:#7C3AED;margin:0 0 16px;">Order confirmed</h2>
+    <p>Hi {{ user.first_name|default:user.email }},</p>
+    <p>Your LeadPortal order is confirmed.</p>
+    <table style="border-collapse:collapse;margin:16px 0;">
+        <tr><td style="padding:4px 12px 4px 0;color:#6b7280;">Order</td><td>#{{ order.id }}</td></tr>
+        <tr><td style="padding:4px 12px 4px 0;color:#6b7280;">Niche</td><td>{{ order.niche }}</td></tr>
+        <tr><td style="padding:4px 12px 4px 0;color:#6b7280;">Quantity</td><td>{{ order.quantity }}</td></tr>
+        <tr><td style="padding:4px 12px 4px 0;color:#6b7280;">Price per lead</td><td>${{ order.price_per_lead }}</td></tr>
+        <tr><td style="padding:4px 12px 4px 0;color:#6b7280;">Total</td><td><strong>${{ order.total_amount }}</strong></td></tr>
+        <tr><td style="padding:4px 12px 4px 0;color:#6b7280;">Status</td><td>{{ order.get_status_display }}</td></tr>
+    </table>
+    <p>— The LeadPortal team</p>
+</div>
+</body></html>

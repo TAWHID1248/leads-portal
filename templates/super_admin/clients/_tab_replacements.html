@@ -1,0 +1,19 @@
+{% load portal_tags %}
+{% if items %}
+<div class="card">
+    <table class="table table-sm table-hover mb-0">
+        <thead class="small text-muted"><tr><th class="ps-3">#</th><th>Lead</th><th>Reason</th><th>Status</th><th>Replacement</th></tr></thead>
+        <tbody>
+            {% for r in items %}
+            <tr>
+                <td class="ps-3 small">#{{ r.id }}</td>
+                <td>{{ r.lead.full_name|default:"—" }}</td>
+                <td>{{ r.get_reason_display }}</td>
+                <td>{% status_badge r.status %}</td>
+                <td class="small">{% if r.replacement_lead %}#{{ r.replacement_lead_id }}{% else %}—{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}{% include 'partials/_empty_state.html' with title="No replacement requests" %}{% endif %}

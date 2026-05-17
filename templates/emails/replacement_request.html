@@ -1,0 +1,12 @@
+<!doctype html>
+<html><body style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;color:#1e1b2e;line-height:1.5;">
+<div style="max-width:560px;margin:0 auto;padding:24px;">
+    <h2 style="color:#7C3AED;margin:0 0 16px;">Replacement request</h2>
+    <p>{{ client.company_name }} has requested a replacement for lead <strong>#{{ lead.id }}</strong>.</p>
+    <table style="border-collapse:collapse;margin:16px 0;">
+        <tr><td style="padding:4px 12px 4px 0;color:#6b7280;">Lead</td><td>{{ lead.full_name|default:lead.email|default:'(no name)' }}</td></tr>
+        <tr><td style="padding:4px 12px 4px 0;color:#6b7280;">Reason</td><td>{{ request.get_reason_display }}</td></tr>
+        {% if request.notes %}<tr><td style="padding:4px 12px 4px 0;color:#6b7280;">Notes</td><td>{{ request.notes }}</td></tr>{% endif %}
+    </table>
+    <p>Review in the queue: <a href="/super/replacements/">/super/replacements/</a></p>
+</div></body></html>

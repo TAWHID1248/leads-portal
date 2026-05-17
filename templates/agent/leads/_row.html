@@ -1,0 +1,26 @@
+{% load portal_tags %}
+<tr id="assign-row-{{ a.id }}">
+    <td class="ps-3 small">#{{ a.lead_id }}</td>
+    <td>
+        <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none fw-semibold"
+                hx-get="{% url 'agent:lead_drawer' a.id %}" hx-target="#leadDrawerBody">
+            {{ a.lead.full_name|default:"—" }}
+        </button>
+    </td>
+    <td>
+        {% if a.lead.phone %}
+        <a href="tel:{{ a.lead.phone }}" class="text-decoration-none">{{ a.lead.phone }}</a>
+        {% else %}<span class="text-muted">—</span>{% endif %}
+    </td>
+    <td class="small">{{ a.lead.email|default:"—" }}</td>
+    <td>{% niche_badge a.lead.niche %}</td>
+    <td class="small">{{ a.lead.state|default:"—" }}</td>
+    <td>{% status_badge a.status %}</td>
+    <td class="small text-muted">{{ a.assigned_at|time_ago }}</td>
+    <td class="pe-3 text-end">
+        <button type="button" class="btn btn-sm btn-outline-primary"
+                data-bs-toggle="modal" data-bs-target="#logCallModal" data-aid="{{ a.id }}">
+            <i class="bi bi-telephone-plus"></i> Log call
+        </button>
+    </td>
+</tr>

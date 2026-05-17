@@ -1,0 +1,102 @@
+{% extends 'client/base.html' %}
+{% load portal_tags %}
+
+{% block title %}My Leads | LeadPortal{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+        <h1 class="h3 mb-0">My Leads</h1>
+        <p class="text-muted small mb-0">{{ total_count }} total</p>
+    </div>
+    <a href="{% url 'client:leads_export' %}?{{ request.GET.urlencode }}" class="btn btn-primary btn-sm">
+        <i class="bi bi-download me-1"></i> Export CSV
+    </a>
+</div>
+
+{% include 'client/leads/_filters.html' %}
+
+<div id="leads-table">
+    {% include 'client/leads/_table.html' %}
+</div>
+
+<div class="offcanvas offcanvas-end" tabindex="-1" id="leadDrawer" style="width: min(560px, 100vw);">
+    <div id="leadDrawerBody"></div>
+</div>
+
+<div class="modal fade" id="replaceModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="replaceForm" method="post"
+                  hx-on::after-request="window.clientLeads.afterReplace(event)">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title">Request replacement</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Reason</label>
+                        <select name="reason" class="form-select" required>
+                            <option value="WRONG_NUMBER">Wrong number</option>
+                            <option value="DUPLICATE">Duplicate</option>
+                            <option value="UNREACHABLE">Unreachable</option>
+                            <option value="UNDER_AGE">Under age</option>
+                            <option value="OUT_OF_AREA">Out of area</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Notes (optional)</label>
+                        <textarea name="notes" class="form-control" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link text-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-warning">Submit request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Open the offcanvas drawer once its content has swapped in.
+    document.body.addEventListener('htmx:afterSwap', (evt) => {
+        if (evt.detail.target && evt.detail.target.id === 'leadDrawerBody') {
+            const el = document.getElementById('leadDrawer');
+            if (el && window.bootstrap) {
+                window.bootstrap.Offcanvas.getOrCreateInstance(el).show();
+            }
+        }
+    });
+
+    // Wire the replacement modal's form to the row that triggered it.
+    const replaceModal = document.getElementById('replaceModal');
+    replaceModal.addEventListener('show.bs.modal', (evt) => {
+        const trigger = evt.relatedTarget;
+        const id = trigger && trigger.getAttribute('data-alloc-id');
+        if (!id) return;
+        const form = document.getElementById('replaceForm');
+        const url = '/client/leads/' + id + '/replace/';
+        form.setAttribute('action', url);
+        form.setAttribute('hx-post', url);
+        if (window.htmx) window.htmx.process(form);
+    });
+
+    window.clientLeads = {
+        afterReplace(event) {
+            const xhr = event && event.detail && event.detail.xhr;
+            if (!xhr) return;
+            if (xhr.status >= 200 && xhr.status < 300) {
+                window.showToast('Replacement request submitted', 'success');
+                bootstrap.Modal.getInstance(replaceModal).hide();
+                if (window.htmx) htmx.ajax('GET', window.location.pathname + window.location.search, '#leads-table');
+            } else {
+                window.showToast('Replacement failed: ' + (xhr.responseText || xhr.status), 'error');
+            }
+        },
+    };
+</script>
+{% endblock %}

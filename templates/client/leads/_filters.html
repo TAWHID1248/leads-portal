@@ -1,0 +1,49 @@
+{% load portal_tags %}
+<form class="card p-3 mb-3"
+      style="position: sticky; top: 60px; z-index: 1010;"
+      hx-get="{% url 'client:leads_list' %}"
+      hx-target="#leads-table"
+      hx-swap="innerHTML"
+      hx-push-url="true"
+      hx-trigger="change, input changed delay:300ms from:input[name='search']">
+    <div class="row g-2 align-items-end">
+        <div class="col-md-3">
+            <label class="form-label small fw-semibold mb-1">Search</label>
+            <input type="text" name="search" value="{{ request.GET.search|default:'' }}"
+                   class="form-control form-control-sm" placeholder="Name, email, phone">
+        </div>
+        <div class="col-md-2">
+            <label class="form-label small fw-semibold mb-1">Niche</label>
+            <select name="niche" class="form-select form-select-sm">
+                <option value="">All niches</option>
+                {% for v,l in niches %}
+                <option value="{{ v }}" {% if request.GET.niche == v %}selected{% endif %}>{{ l }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-1">
+            <label class="form-label small fw-semibold mb-1">State</label>
+            <input type="text" name="state" value="{{ request.GET.state|default:'' }}"
+                   class="form-control form-control-sm">
+        </div>
+        <div class="col-md-2">
+            <label class="form-label small fw-semibold mb-1">My status</label>
+            <select name="my_status" class="form-select form-select-sm">
+                <option value="">All statuses</option>
+                {% for v,l in client_statuses %}
+                <option value="{{ v }}" {% if request.GET.my_status == v %}selected{% endif %}>{{ l }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label small fw-semibold mb-1">From</label>
+            <input type="date" name="date_from" value="{{ request.GET.date_from|default:'' }}"
+                   class="form-control form-control-sm">
+        </div>
+        <div class="col-md-2">
+            <label class="form-label small fw-semibold mb-1">To</label>
+            <input type="date" name="date_to" value="{{ request.GET.date_to|default:'' }}"
+                   class="form-control form-control-sm">
+        </div>
+    </div>
+</form>

@@ -1,0 +1,7 @@
+Replacement request from {{ client.company_name }}
+
+Lead #{{ lead.id }} — {{ lead.full_name|default:lead.email|default:'(no name)' }}
+Reason: {{ request.get_reason_display }}
+{% if request.notes %}Notes: {{ request.notes }}{% endif %}
+
+Review in the queue: /super/replacements/

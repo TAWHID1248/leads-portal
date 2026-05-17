@@ -1,0 +1,75 @@
+{% extends 'agent/base.html' %}
+{% load portal_tags %}
+
+{% block title %}My leads | LeadPortal{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+        <h1 class="h3 mb-0">My leads</h1>
+        <p class="text-muted small mb-0">{{ total_count }} total</p>
+    </div>
+</div>
+
+<form class="card p-3 mb-3" method="get"
+      hx-get="{% url 'agent:leads_list' %}"
+      hx-target="#leads-table" hx-swap="innerHTML" hx-push-url="true"
+      hx-trigger="change, input changed delay:300ms from:input[name='search']">
+    <div class="row g-2 align-items-end">
+        <div class="col-md-4">
+            <label class="form-label small fw-semibold mb-1">Search</label>
+            <input type="text" name="search" value="{{ request.GET.search|default:'' }}"
+                   class="form-control form-control-sm" placeholder="Name / email / phone">
+        </div>
+        <div class="col-md-3">
+            <label class="form-label small fw-semibold mb-1">Status</label>
+            <select name="status" class="form-select form-select-sm">
+                <option value="">Any</option>
+                {% for v,l in assignment_statuses %}<option value="{{ v }}" {% if request.GET.status == v %}selected{% endif %}>{{ l }}</option>{% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label small fw-semibold mb-1">Niche</label>
+            <select name="niche" class="form-select form-select-sm">
+                <option value="">Any</option>
+                {% for v,l in niches %}<option value="{{ v }}" {% if request.GET.niche == v %}selected{% endif %}>{{ l }}</option>{% endfor %}
+            </select>
+        </div>
+    </div>
+</form>
+
+<div id="leads-table">
+    {% include 'agent/leads/_table.html' %}
+</div>
+
+<div class="offcanvas offcanvas-end" tabindex="-1" id="leadDrawer" style="width:min(560px,100vw);">
+    <div id="leadDrawerBody"></div>
+</div>
+{% include 'agent/leads/_log_call_modal.html' %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.body.addEventListener('htmx:afterSwap', (evt) => {
+    if (evt.detail.target && evt.detail.target.id === 'leadDrawerBody') {
+        const el = document.getElementById('leadDrawer');
+        if (el && window.bootstrap) bootstrap.Offcanvas.getOrCreateInstance(el).show();
+    }
+});
+const logModal = document.getElementById('logCallModal');
+logModal.addEventListener('show.bs.modal', (evt) => {
+    const id = evt.relatedTarget.getAttribute('data-aid');
+    const form = document.getElementById('logCallForm');
+    form.setAttribute('hx-post', '/agent/leads/' + id + '/log-call/');
+    form.setAttribute('hx-target', '#assign-row-' + id);
+    form.setAttribute('hx-swap', 'outerHTML');
+    if (window.htmx) htmx.process(form);
+});
+document.body.addEventListener('htmx:afterRequest', (evt) => {
+    if (evt.target && evt.target.id === 'logCallForm' && evt.detail.xhr.status >= 200 && evt.detail.xhr.status < 300) {
+        window.showToast('Call logged', 'success');
+        bootstrap.Modal.getInstance(logModal).hide();
+    }
+});
+</script>
+{% endblock %}

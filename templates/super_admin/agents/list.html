@@ -1,0 +1,62 @@
+{% extends 'super_admin/base.html' %}
+{% load portal_tags %}
+
+{% block title %}Agents | LeadPortal{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+        <h1 class="h3 mb-0">Agents</h1>
+        <p class="text-muted small mb-0">{{ total_count }} total</p>
+    </div>
+    <a href="{% url 'super_admin:agent_create' %}" class="btn btn-primary btn-sm">
+        <i class="bi bi-plus-circle me-1"></i> New agent
+    </a>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0 align-middle">
+            <thead class="small text-muted">
+                <tr>
+                    <th class="ps-3">Agent</th>
+                    <th>Status</th>
+                    <th>Leads assigned</th>
+                    <th>Calls today</th>
+                    <th>Sold this week</th>
+                    <th>Commission (month)</th>
+                    <th>Targets</th>
+                    <th class="pe-3"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in agents %}
+                <tr>
+                    <td class="ps-3">
+                        <a href="{% url 'super_admin:agent_detail' a.id %}" class="fw-semibold text-decoration-none">
+                            {{ a.user.get_full_name|default:a.user.email }}
+                        </a><br>
+                        <span class="small text-muted">{{ a.user.email }}</span>
+                    </td>
+                    <td>{% status_badge a.user.status %}</td>
+                    <td>{{ a.leads_assigned }}</td>
+                    <td>{{ a.calls_today }}</td>
+                    <td>{{ a.sold_this_week }}</td>
+                    <td>{{ a.commission_month|default:0|money }}</td>
+                    <td class="small text-muted">{{ a.target_leads }} leads / {{ a.target_revenue|money }}</td>
+                    <td class="pe-3 text-end">
+                        <a href="{% url 'super_admin:agent_detail' a.id %}" class="btn btn-sm btn-link text-secondary">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="8" class="p-0">
+                    {% include 'partials/_empty_state.html' with title="No agents yet" description="Create your first agent above." %}
+                </td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% csrf_token %}
+<div id="bulkActionsBar"
+     class="card shadow position-fixed start-50 translate-middle-x px-3 py-2 d-none align-items-center gap-3"
+     style="bottom: 24px; z-index: 1080; min-width: 480px;">
+    <span class="small text-muted me-2">
+        <span id="bulkCount">0</span> selected
+    </span>
+    <button type="button" class="btn btn-sm btn-primary"
+            id="bulkAssignBtn"
+            data-bs-toggle="modal" data-bs-target="#assignModal">
+        <i class="bi bi-arrow-right-circle me-1"></i> Assign
+    </button>
+    <button type="button" class="btn btn-sm btn-outline-primary"
+            id="bulkExportBtn">
+        <i class="bi bi-download me-1"></i> Export CSV
+    </button>
+    <button type="button" class="btn btn-sm btn-outline-danger"
+            id="bulkRejectBtn">
+        <i class="bi bi-x-circle me-1"></i> Reject
+    </button>
+    <button type="button" class="btn btn-sm btn-link text-secondary ms-auto"
+            id="bulkClearBtn">Clear</button>
+</div>

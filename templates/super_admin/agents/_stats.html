@@ -1,0 +1,27 @@
+{% load portal_tags %}
+<div class="row g-3" id="agentStats">
+    <div class="col-md-3">
+        <div class="card p-3">
+            <div class="text-muted small">Leads assigned</div>
+            <div class="h4 mb-0">{{ agent.leads_assigned }}</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3">
+            <div class="text-muted small">Calls today</div>
+            <div class="h4 mb-0">{{ agent.calls_today }}</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3">
+            <div class="text-muted small">Sold this week</div>
+            <div class="h4 mb-0">{{ agent.sold_this_week }}</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3">
+            <div class="text-muted small">Commission (this month)</div>
+            <div class="h4 mb-0">{{ agent.commission_month|default:0|money }}</div>
+        </div>
+    </div>
+</div>

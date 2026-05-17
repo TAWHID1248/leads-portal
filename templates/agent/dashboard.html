@@ -1,0 +1,95 @@
+{% extends 'agent/base.html' %}
+{% load portal_tags %}
+
+{% block title %}Agent dashboard | LeadPortal{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-1">Welcome, {{ user.first_name|default:user.email }}</h1>
+<p class="text-muted small mb-3">Agent · target {{ agent.target_leads }} leads / {{ agent.target_revenue|money }}</p>
+
+<div class="row g-3 mb-4">
+    <div class="col-md col-6"><div class="kpi-card"><div class="kpi-label">Leads assigned</div><div class="kpi-value">{{ kpis.leads_assigned }}</div></div></div>
+    <div class="col-md col-6"><div class="kpi-card"><div class="kpi-label">Calls today</div><div class="kpi-value">{{ kpis.calls_today }}</div></div></div>
+    <div class="col-md col-6"><div class="kpi-card"><div class="kpi-label">Sold this week</div><div class="kpi-value">{{ kpis.sold_this_week }}</div></div></div>
+    <div class="col-md col-6"><div class="kpi-card"><div class="kpi-label">Commission (month)</div><div class="kpi-value">{{ kpis.commission_month|money }}</div></div></div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="mb-3">Weekly targets</h6>
+                <div class="mb-2 small text-muted">
+                    Leads: <strong>{{ target_progress.leads_done }}</strong> / {{ target_progress.leads_target }}
+                </div>
+                <div class="progress mb-3" style="height: 12px;">
+                    <div class="progress-bar" role="progressbar"
+                         style="width: {% widthratio target_progress.leads_done target_progress.leads_target 100 %}%;">
+                    </div>
+                </div>
+                <div class="mb-2 small text-muted">
+                    Revenue: <strong>{{ target_progress.revenue_done|money }}</strong> / {{ target_progress.revenue_target|money }}
+                </div>
+                <div class="progress mb-3" style="height: 12px;">
+                    <div class="progress-bar bg-success" role="progressbar"
+                         style="width: {% widthratio target_progress.revenue_done target_progress.revenue_target 100 %}%;">
+                    </div>
+                </div>
+                <p class="small text-muted mb-0">{{ target_progress.days_remaining_in_week }} days remaining this week</p>
+            </div>
+        </div>
+        <div class="card mt-3">
+            <div class="card-body">
+                <h6 class="mb-3">Calls today by outcome</h6>
+                <div style="position: relative; height: 240px;">
+                    <canvas id="callsTodayChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="mb-3">Recent activity</h6>
+                {% if activity %}
+                <ul class="list-unstyled mb-0">
+                    {% for a in activity %}
+                    <li class="border-start ps-3 mb-3" style="border-color: var(--portal-primary) !important;">
+                        <div class="small fw-semibold">{{ a.verb }} — {{ a.detail }}</div>
+                        <div class="small text-muted">
+                            {{ a.lead.full_name|default:a.lead.email|default:'(no name)' }}
+                            · {{ a.when|time_ago }}
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                {% include 'partials/_empty_state.html' with title="No recent activity" %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+fetch("{% url 'agent:chart_data' %}", {credentials: 'same-origin'})
+    .then(r => r.json())
+    .then(data => {
+        const el = document.getElementById('callsTodayChart');
+        if (!el || !window.Chart) return;
+        new Chart(el, {
+            type: 'doughnut',
+            data,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom', labels: {boxWidth: 12} } },
+            },
+        });
+    })
+    .catch(() => {});
+</script>
+{% endblock %}

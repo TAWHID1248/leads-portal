@@ -1,0 +1,10 @@
+<!doctype html>
+<html><body style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;color:#1e1b2e;line-height:1.5;">
+<div style="max-width:560px;margin:0 auto;padding:24px;">
+    <h2 style="color:#F59E0B;margin:0 0 16px;">🎉 You've won!</h2>
+    <p>Congratulations {{ winner.first_name|default:winner.email }} — you've won the
+       <strong>{{ sweepstakes.title }}</strong> sweepstakes.</p>
+    <p>Prize: <strong>{{ sweepstakes.prize_title }}</strong> (value ${{ sweepstakes.prize_value }}).</p>
+    <p>We'll be in touch about delivery.</p>
+    <p>— The LeadPortal team</p>
+</div></body></html>

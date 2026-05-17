@@ -1,0 +1,84 @@
+{% extends 'super_admin/base.html' %}
+{% load portal_tags %}
+
+{% block title %}{{ page_title }} | LeadPortal{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="small mb-2">
+    <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="{% url 'super_admin:agent_list' %}">Agents</a></li>
+        <li class="breadcrumb-item active">{{ page_title }}</li>
+    </ol>
+</nav>
+
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+        <h1 class="h3 mb-1">{{ page_title }}</h1>
+        <p class="text-muted small mb-0">
+            {{ agent.user.email }} · {% status_badge agent.user.status %}
+        </p>
+    </div>
+    <button type="button" class="btn btn-sm btn-outline-secondary"
+            hx-get="{% url 'super_admin:agent_stats' agent.id %}"
+            hx-target="#agentStats" hx-swap="outerHTML">
+        <i class="bi bi-arrow-clockwise"></i> Refresh stats
+    </button>
+</div>
+
+{% include 'super_admin/agents/_stats.html' %}
+
+<div class="row g-3 mt-1">
+    <div class="col-md-5">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="mb-3">Targets &amp; commission</h6>
+                <form method="post">
+                    {% csrf_token %}
+                    {% include 'super_admin/clients/_form_fields.html' %}
+                    <button type="submit" class="btn btn-primary btn-sm">Save</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-7">
+        <div class="card mb-3">
+            <div class="card-body">
+                <h6 class="mb-3">Recent assignments</h6>
+                {% if recent_assignments %}
+                <table class="table table-sm mb-0">
+                    <thead class="small text-muted"><tr><th>Lead</th><th>Status</th><th>Assigned</th></tr></thead>
+                    <tbody>
+                        {% for a in recent_assignments %}
+                        <tr>
+                            <td>{{ a.lead.full_name|default:"—" }}</td>
+                            <td>{{ a.get_status_display }}</td>
+                            <td class="small text-muted">{{ a.assigned_at|time_ago }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}<p class="text-muted small mb-0">No recent assignments.</p>{% endif %}
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h6 class="mb-3">Recent calls</h6>
+                {% if recent_calls %}
+                <table class="table table-sm mb-0">
+                    <thead class="small text-muted"><tr><th>Outcome</th><th>Duration</th><th>Called</th></tr></thead>
+                    <tbody>
+                        {% for c in recent_calls %}
+                        <tr>
+                            <td>{{ c.get_outcome_display }}</td>
+                            <td>{{ c.duration_seconds }}s</td>
+                            <td class="small text-muted">{{ c.called_at|time_ago }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}<p class="text-muted small mb-0">No call logs.</p>{% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

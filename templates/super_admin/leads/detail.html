@@ -1,0 +1,26 @@
+{% extends 'super_admin/base.html' %}
+{% load portal_tags %}
+
+{% block title %}Lead #{{ lead.id }} | LeadPortal{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="small mb-2">
+    <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="{% url 'super_admin:leads_list' %}">Leads</a></li>
+        <li class="breadcrumb-item active">#{{ lead.id }}</li>
+    </ol>
+</nav>
+
+<div class="card">
+    {% include 'super_admin/leads/_detail_drawer.html' %}
+</div>
+
+{% include 'super_admin/leads/_assign_modal.html' %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => window.portalLeads && window.portalLeads.init());
+</script>
+{% endblock %}

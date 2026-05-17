@@ -1,0 +1,20 @@
+{% extends 'client/base.html' %}
+{% load portal_tags %}
+
+{% block title %}Invoice {{ invoice.invoice_number }} | LeadPortal{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-3">Invoice {{ invoice.invoice_number }}</h1>
+<div class="card" style="max-width: 720px;">
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-4 text-muted fw-normal">Status</dt><dd class="col-8">{% status_badge invoice.status %}</dd>
+            <dt class="col-4 text-muted fw-normal">Issued</dt><dd class="col-8">{{ invoice.issued_at|date:"M j, Y H:i"|default:"—" }}</dd>
+            <dt class="col-4 text-muted fw-normal">Paid</dt><dd class="col-8">{{ invoice.paid_at|date:"M j, Y H:i"|default:"—" }}</dd>
+            <dt class="col-4 text-muted fw-normal">Order</dt><dd class="col-8">#{{ invoice.order_id }} — {{ invoice.order.quantity }} × {{ invoice.order.niche }}</dd>
+            <dt class="col-4 text-muted fw-normal">Amount</dt><dd class="col-8"><strong>{{ invoice.amount|money }}</strong></dd>
+        </dl>
+    </div>
+</div>
+<p class="text-muted small mt-3">PDF generation is not yet wired up; the link above shows this HTML invoice as a fallback.</p>
+{% endblock %}

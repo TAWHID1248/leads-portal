@@ -1,0 +1,33 @@
+{% extends 'super_admin/base.html' %}
+{% load portal_tags %}
+
+{% block title %}Leads | LeadPortal{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+        <h1 class="h3 mb-0">Leads</h1>
+        <p class="text-muted small mb-0" id="leadsTotal">{{ total_count }} total</p>
+    </div>
+</div>
+
+{% include 'super_admin/leads/_filters.html' %}
+
+<div id="leads-table">
+    {% include 'super_admin/leads/_table.html' %}
+</div>
+
+{% include 'super_admin/leads/_bulk_actions_bar.html' %}
+{% include 'super_admin/leads/_assign_modal.html' %}
+
+{# Offcanvas drawer container — populated via HTMX, shown via portal.js #}
+<div class="offcanvas offcanvas-end" tabindex="-1" id="leadDrawer" style="width: min(640px, 100vw);">
+    <div id="leadDrawerBody"></div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => window.portalLeads && window.portalLeads.init());
+</script>
+{% endblock %}

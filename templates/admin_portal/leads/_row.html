@@ -1,0 +1,29 @@
+{% load portal_tags %}
+<tr id="lead-row-{{ lead.id }}">
+    <td class="ps-3 small">#{{ lead.id }}</td>
+    <td>{{ lead.full_name|default:"—" }}</td>
+    <td class="small">{{ lead.phone|default:"—" }}</td>
+    <td class="small">{{ lead.email|default:"—" }}</td>
+    <td>{% niche_badge lead.niche %}</td>
+    <td>
+        <form hx-post="{% url 'admin_portal:lead_update' lead.id %}"
+              hx-target="#lead-row-{{ lead.id }}" hx-swap="outerHTML"
+              hx-trigger="change from:select" class="m-0">
+            {% csrf_token %}
+            <select name="quality_score" class="form-select form-select-sm" style="width: 70px;">
+                {% for i in "12345678910"|make_list %}<option value="{{ forloop.counter }}" {% if lead.quality_score == forloop.counter %}selected{% endif %}>{{ forloop.counter }}</option>{% endfor %}
+            </select>
+        </form>
+    </td>
+    <td>
+        <form hx-post="{% url 'admin_portal:lead_update' lead.id %}"
+              hx-target="#lead-row-{{ lead.id }}" hx-swap="outerHTML"
+              hx-trigger="blur from:input" class="m-0">
+            {% csrf_token %}
+            <input type="text" name="notes" class="form-control form-control-sm"
+                   value="{{ lead.notes|default:'' }}" placeholder="Add note…">
+        </form>
+    </td>
+    <td>{% status_badge lead.status %}</td>
+    <td class="small text-muted">{{ lead.created_at|time_ago }}</td>
+</tr>

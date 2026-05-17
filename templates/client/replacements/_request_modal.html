@@ -1,0 +1,57 @@
+{% load portal_tags %}
+<div class="modal fade" id="requestModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="requestForm" onsubmit="return false;">
+                {% csrf_token %}
+                <input type="hidden" name="allocation_id" id="allocation_id">
+                <div class="modal-header">
+                    <h5 class="modal-title">Request replacement</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="rstep-lead">
+                        <label class="form-label small fw-semibold">1. Choose lead</label>
+                        <input type="search" class="form-control mb-2" placeholder="Search by name, email, phone"
+                               name="q"
+                               hx-get="{% url 'client:replacements_eligible' %}"
+                               hx-target="#eligibleOptions"
+                               hx-trigger="keyup changed delay:300ms, load">
+                        <select id="allocationSelect" class="form-select" size="6">
+                            <option value="">— Loading… —</option>
+                        </select>
+                        <div id="eligibleOptions" class="d-none"></div>
+                        <div class="small text-muted mt-2" id="allocationLabel">No lead selected</div>
+                    </div>
+
+                    <div id="rstep-reason" class="d-none">
+                        <label class="form-label small fw-semibold">2. Reason</label>
+                        <div class="d-flex flex-column gap-2">
+                            {% for v,l in reasons %}
+                            <label class="d-flex align-items-center gap-2">
+                                <input type="radio" name="reason" value="{{ v }}" class="form-check-input m-0">
+                                <span>{{ l }}</span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div id="rstep-notes" class="d-none">
+                        <label class="form-label small fw-semibold">3. Notes &amp; summary</label>
+                        <textarea name="notes" class="form-control mb-3" rows="3" placeholder="Any context for the admin reviewing this"></textarea>
+                        <table class="table table-sm mb-0">
+                            <tr><td class="text-muted">Lead</td><td id="summaryLead"></td></tr>
+                            <tr><td class="text-muted">Reason</td><td id="summaryReason"></td></tr>
+                        </table>
+                    </div>
+
+                    <div id="rError" class="small text-danger mt-2"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link text-secondary" id="rPrev">Back</button>
+                    <button type="button" class="btn btn-primary" id="rNext">Next</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

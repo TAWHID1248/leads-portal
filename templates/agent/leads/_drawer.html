@@ -1,0 +1,39 @@
+{% load portal_tags %}
+<div class="offcanvas-header border-bottom">
+    <div>
+        <h5 class="offcanvas-title mb-1">{{ lead.full_name|default:"Lead" }}</h5>
+        <div class="small text-muted">
+            {% niche_badge lead.niche %} {% status_badge a.status %}
+        </div>
+    </div>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+</div>
+<div class="offcanvas-body small">
+    <dl class="row mb-3">
+        <dt class="col-5 text-muted fw-normal">Phone</dt>
+        <dd class="col-7">{% if lead.phone %}<a href="tel:{{ lead.phone }}">{{ lead.phone }}</a>{% else %}—{% endif %}</dd>
+        <dt class="col-5 text-muted fw-normal">Email</dt>
+        <dd class="col-7">{{ lead.email|default:"—" }}</dd>
+        <dt class="col-5 text-muted fw-normal">State</dt>
+        <dd class="col-7">{{ lead.state|default:"—" }}</dd>
+        <dt class="col-5 text-muted fw-normal">Niche</dt>
+        <dd class="col-7">{% niche_badge lead.niche %}</dd>
+        {% if 'solar' in lead.niche %}
+        <dt class="col-5 text-muted fw-normal">Monthly bill</dt><dd class="col-7">{{ lead.monthly_bill|money|default:"—" }}</dd>
+        <dt class="col-5 text-muted fw-normal">Credit</dt><dd class="col-7">{{ lead.credit_score|default:"—" }}</dd>
+        {% endif %}
+    </dl>
+
+    <h6 class="text-uppercase text-muted small">Call history</h6>
+    {% if calls %}
+    <ul class="list-unstyled mb-0">
+        {% for c in calls %}
+        <li class="border-start ps-3 mb-3" style="border-color:var(--portal-primary)!important;">
+            <div class="small fw-semibold">{{ c.get_outcome_display }} · {{ c.duration_seconds }}s</div>
+            <div class="small text-muted">{{ c.called_at|time_ago }}{% if c.next_follow_up %} · follow-up {{ c.next_follow_up|date:"M j, Y H:i" }}{% endif %}</div>
+            {% if c.notes %}<div class="small">{{ c.notes }}</div>{% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}<p class="text-muted small mb-0">No calls logged yet.</p>{% endif %}
+</div>

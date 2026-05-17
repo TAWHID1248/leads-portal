@@ -1,0 +1,6 @@
+{% if unread_notification_count > 0 %}
+<span class="badge bg-danger position-absolute rounded-pill"
+      style="top:-5px;right:-7px;font-size:0.6rem;min-width:16px;padding:2px 4px;">
+    {{ unread_notification_count }}
+</span>
+{% endif %}

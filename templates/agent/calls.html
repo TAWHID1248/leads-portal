@@ -1,0 +1,69 @@
+{% extends 'agent/base.html' %}
+{% load portal_tags %}
+
+{% block title %}Calls | LeadPortal{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+        <h1 class="h3 mb-0">Call log</h1>
+        <p class="text-muted small mb-0">{{ total_count }} total</p>
+    </div>
+    <a href="{% url 'agent:calls_export' %}?{{ request.GET.urlencode }}" class="btn btn-primary btn-sm">
+        <i class="bi bi-download me-1"></i> Export CSV
+    </a>
+</div>
+
+<form class="card p-3 mb-3" method="get">
+    <div class="row g-2 align-items-end">
+        <div class="col-md-3">
+            <label class="form-label small fw-semibold mb-1">Outcome</label>
+            <select name="outcome" class="form-select form-select-sm">
+                <option value="">Any</option>
+                {% for v,l in outcomes %}<option value="{{ v }}" {% if request.GET.outcome == v %}selected{% endif %}>{{ l }}</option>{% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label small fw-semibold mb-1">Niche</label>
+            <select name="niche" class="form-select form-select-sm">
+                <option value="">Any</option>
+                {% for v,l in niches %}<option value="{{ v }}" {% if request.GET.niche == v %}selected{% endif %}>{{ l }}</option>{% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label small fw-semibold mb-1">From</label>
+            <input type="date" name="date_from" class="form-control form-control-sm" value="{{ request.GET.date_from|default:'' }}">
+        </div>
+        <div class="col-md-2">
+            <label class="form-label small fw-semibold mb-1">To</label>
+            <input type="date" name="date_to" class="form-control form-control-sm" value="{{ request.GET.date_to|default:'' }}">
+        </div>
+        <div class="col-md-2 d-flex gap-2">
+            <button class="btn btn-sm btn-primary w-100">Apply</button>
+        </div>
+    </div>
+</form>
+
+<div class="card">
+    <table class="table table-hover mb-0 align-middle">
+        <thead class="small text-muted">
+            <tr><th class="ps-3">When</th><th>Lead</th><th>Niche</th><th>Outcome</th><th>Duration</th><th>Follow-up</th><th class="pe-3">Notes</th></tr>
+        </thead>
+        <tbody>
+            {% for c in page_obj %}
+            <tr>
+                <td class="ps-3 small text-muted">{{ c.called_at|date:"M j, Y H:i" }}</td>
+                <td>{{ c.lead.full_name|default:"—" }}</td>
+                <td>{% niche_badge c.lead.niche %}</td>
+                <td>{{ c.get_outcome_display }}</td>
+                <td>{{ c.duration_seconds }}s</td>
+                <td class="small text-muted">{{ c.next_follow_up|date:"M j, H:i"|default:"—" }}</td>
+                <td class="pe-3 small text-muted">{{ c.notes|default:"—"|truncatechars:60 }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7" class="p-0">{% include 'partials/_empty_state.html' with title="No calls logged yet" %}</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

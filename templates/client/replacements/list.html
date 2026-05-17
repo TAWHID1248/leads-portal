@@ -1,0 +1,120 @@
+{% extends 'client/base.html' %}
+{% load portal_tags %}
+
+{% block title %}Replacements | LeadPortal{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+        <h1 class="h3 mb-0">Replacements</h1>
+        <p class="text-muted small mb-0">{{ eligible_count }} leads currently eligible</p>
+    </div>
+    <button type="button" class="btn btn-primary btn-sm"
+            data-bs-toggle="modal" data-bs-target="#requestModal"
+            {% if eligible_count == 0 %}disabled{% endif %}>
+        <i class="bi bi-arrow-repeat me-1"></i> Request replacement
+    </button>
+</div>
+
+<div class="alert" style="background:#FFFBEB;border:1px solid #FDE68A;color:#92400E;">
+    <h6 class="fw-semibold">Replacement policy</h6>
+    <ul class="mb-0 small">
+        <li>You can request a replacement within <strong>{{ window_days }} days</strong> of receiving a lead.</li>
+        <li>Approved replacements can total at most <strong>{{ max_rate_percent }}%</strong> of leads in a single order.</li>
+        <li>Valid reasons: wrong number, duplicate, unreachable after multiple attempts, under-age, out-of-area.</li>
+        <li>Decisions are reviewed by an admin and a replacement lead is allocated automatically when approved.</li>
+    </ul>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <h6 class="mb-3">Request history</h6>
+        {% if history %}
+        <table class="table table-sm align-middle mb-0">
+            <thead class="small text-muted"><tr><th>#</th><th>Original lead</th><th>Reason</th><th>Status</th><th>Replacement</th><th>Updated</th></tr></thead>
+            <tbody>
+                {% for r in history %}
+                <tr>
+                    <td class="small">#{{ r.id }}</td>
+                    <td class="small">#{{ r.lead_id }} {{ r.lead.full_name|default:"" }}</td>
+                    <td><span class="badge bg-light text-dark border">{{ r.get_reason_display }}</span></td>
+                    <td>{% status_badge r.status %}</td>
+                    <td class="small">{% if r.replacement_lead %}#{{ r.replacement_lead_id }} {{ r.replacement_lead.full_name|default:"" }}{% else %}—{% endif %}</td>
+                    <td class="small text-muted">{{ r.reviewed_at|time_ago|default:r.id|default:"—" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        {% include 'partials/_empty_state.html' with title="No replacement requests yet" description="If a lead doesn't pan out, you can request a replacement within 7 days." %}
+        {% endif %}
+    </div>
+</div>
+
+{% include 'client/replacements/_request_modal.html' %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const reqModal = document.getElementById('requestModal');
+const reqForm = document.getElementById('requestForm');
+const steps = ['rstep-lead', 'rstep-reason', 'rstep-notes'];
+let stepIdx = 0;
+
+function showStep(i) {
+    steps.forEach((id, idx) => document.getElementById(id).classList.toggle('d-none', idx !== i));
+    document.getElementById('rPrev').disabled = i === 0;
+    document.getElementById('rNext').textContent = (i === steps.length - 1) ? 'Submit' : 'Next';
+    stepIdx = i;
+}
+reqModal.addEventListener('show.bs.modal', () => { reqForm.reset(); showStep(0); document.getElementById('rError').textContent=''; });
+document.getElementById('rPrev').addEventListener('click', () => showStep(Math.max(0, stepIdx - 1)));
+document.getElementById('rNext').addEventListener('click', async () => {
+    if (stepIdx === 0) {
+        const v = document.getElementById('allocation_id').value;
+        if (!v) { document.getElementById('rError').textContent = 'Pick a lead.'; return; }
+        document.getElementById('rError').textContent = '';
+        showStep(1); return;
+    }
+    if (stepIdx === 1) {
+        const reason = reqForm.querySelector('input[name=reason]:checked');
+        if (!reason) { document.getElementById('rError').textContent = 'Choose a reason.'; return; }
+        document.getElementById('summaryLead').textContent = document.getElementById('allocationLabel').textContent;
+        document.getElementById('summaryReason').textContent = reason.parentElement.textContent.trim();
+        document.getElementById('rError').textContent = '';
+        showStep(2); return;
+    }
+    // Submit
+    const fd = new FormData(reqForm);
+    const resp = await fetch('{% url "client:replacements_submit" %}', {
+        method: 'POST',
+        headers: {'X-CSRFToken': fd.get('csrfmiddlewaretoken') || ''},
+        body: fd,
+    });
+    const j = await resp.json().catch(() => ({}));
+    if (resp.ok && j.ok) {
+        window.showToast('Replacement request submitted', 'success');
+        bootstrap.Modal.getInstance(reqModal).hide();
+        setTimeout(() => window.location.reload(), 500);
+    } else {
+        document.getElementById('rError').textContent = (j.error || 'Submission failed.');
+    }
+});
+
+// HTMX populates the eligible-options select via /replacements/eligible/ search.
+document.addEventListener('htmx:afterSwap', (evt) => {
+    if (evt.target && evt.target.id === 'eligibleOptions') {
+        // The first option becomes the selected one for convenience.
+        const sel = document.getElementById('allocationSelect');
+        if (sel) sel.dispatchEvent(new Event('change'));
+    }
+});
+document.addEventListener('change', (evt) => {
+    if (evt.target && evt.target.id === 'allocationSelect') {
+        const opt = evt.target.options[evt.target.selectedIndex];
+        document.getElementById('allocation_id').value = opt ? opt.value : '';
+        document.getElementById('allocationLabel').textContent = opt ? opt.textContent : '';
+    }
+});
+</script>
+{% endblock %}

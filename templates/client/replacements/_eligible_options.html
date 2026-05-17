@@ -1,0 +1,11 @@
+{% load portal_tags %}
+<select id="allocationSelect" class="form-select" size="6"
+        hx-swap-oob="outerHTML">
+    {% for a in allocations %}
+    <option value="{{ a.id }}">
+        #{{ a.lead.id }} — {{ a.lead.full_name|default:a.lead.email }} ({{ a.lead.phone|default:"—" }}) · {{ a.allocated_at|date:"M j" }}
+    </option>
+    {% empty %}
+    <option value="" disabled>— No eligible leads —</option>
+    {% endfor %}
+</select>

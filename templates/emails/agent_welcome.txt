@@ -1,0 +1,14 @@
+Hi {{ user.first_name|default:user.email }},
+
+Your LeadPortal agent account is ready.
+
+Login URL:  {{ login_url }}
+Email:      {{ user.email }}
+Password:   {{ temp_password }}
+
+Targets: {{ agent.target_leads }} leads / ${{ agent.target_revenue }} revenue
+Commission: {{ agent.commission }}
+
+After signing in, please change your password from your profile.
+
+— The LeadPortal team

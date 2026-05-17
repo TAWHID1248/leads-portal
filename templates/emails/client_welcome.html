@@ -1,0 +1,17 @@
+<!doctype html>
+<html>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #1e1b2e; line-height: 1.5;">
+    <div style="max-width: 560px; margin: 0 auto; padding: 24px;">
+        <h2 style="color: #7C3AED; margin: 0 0 16px;">Welcome to LeadPortal</h2>
+        <p>Hi {{ user.first_name|default:user.email }},</p>
+        <p>Your LeadPortal client account for <strong>{{ client.company_name }}</strong> is ready.</p>
+        <table style="border-collapse: collapse; margin: 16px 0;">
+            <tr><td style="padding: 4px 12px 4px 0; color: #6b7280;">Login URL</td><td><a href="{{ login_url }}">{{ login_url }}</a></td></tr>
+            <tr><td style="padding: 4px 12px 4px 0; color: #6b7280;">Email</td><td>{{ user.email }}</td></tr>
+            <tr><td style="padding: 4px 12px 4px 0; color: #6b7280;">Password</td><td><code>{{ temp_password }}</code></td></tr>
+        </table>
+        <p>After signing in, please change your password from your profile.</p>
+        <p style="color: #6b7280; font-size: 13px; margin-top: 24px;">— The LeadPortal team</p>
+    </div>
+</body>
+</html>

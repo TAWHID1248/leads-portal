@@ -1,0 +1,9 @@
+Hi {{ user.first_name|default:user.email }},
+
+Your replacement request for lead #{{ original_lead.id }} ({{ original_lead.full_name }}) was not approved.
+
+{% if reason_note %}Reason: {{ reason_note }}
+{% endif %}
+If you believe this is in error, please reply to this email.
+
+— The LeadPortal team

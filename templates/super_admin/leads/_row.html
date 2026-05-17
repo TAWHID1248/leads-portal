@@ -1,0 +1,81 @@
+{% load portal_tags %}
+<tr id="lead-row-{{ lead.id }}" data-lead-id="{{ lead.id }}">
+    <td class="ps-3">
+        <input type="checkbox" class="form-check-input lead-row-check" value="{{ lead.id }}">
+    </td>
+    <td>
+        <button type="button"
+                class="btn btn-link btn-sm p-0 text-decoration-none fw-semibold"
+                data-copy="{{ lead.id }}"
+                title="Copy ID">
+            #{{ lead.id }}
+        </button>
+    </td>
+    <td>
+        <a href="{% url 'super_admin:lead_detail' lead.id %}"
+           class="text-decoration-none fw-semibold"
+           hx-get="{% url 'super_admin:lead_drawer' lead.id %}"
+           hx-target="#leadDrawerBody"
+           hx-trigger="click"
+           hx-on::after-request="window.portalLeads.openDrawer()">
+            {{ lead.full_name|default:"—" }}
+        </a>
+    </td>
+    <td>
+        {% if lead.phone %}
+        <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none"
+                data-copy="{{ lead.phone }}" title="Copy phone">
+            {{ lead.phone }}
+        </button>
+        {% else %}<span class="text-muted">—</span>{% endif %}
+    </td>
+    <td>
+        {% if lead.email %}
+        <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none small"
+                data-copy="{{ lead.email }}" title="Copy email">
+            {{ lead.email }}
+        </button>
+        {% else %}<span class="text-muted">—</span>{% endif %}
+    </td>
+    <td>{% niche_badge lead.niche %}</td>
+    <td class="small">{{ lead.state|default:"—" }}</td>
+    <td>{% quality_badge lead.quality_score %}</td>
+    <td>{% status_badge lead.status %}</td>
+    <td class="small text-muted">{{ lead.created_at|time_ago }}</td>
+    <td class="pe-3 text-end">
+        <div class="dropdown">
+            <button class="btn btn-sm btn-link text-secondary p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-three-dots-vertical"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                <li>
+                    <button type="button" class="dropdown-item"
+                            hx-get="{% url 'super_admin:lead_drawer' lead.id %}"
+                            hx-target="#leadDrawerBody"
+                            hx-on::after-request="window.portalLeads.openDrawer()">
+                        <i class="bi bi-eye me-2"></i>View
+                    </button>
+                </li>
+                <li>
+                    <button type="button" class="dropdown-item"
+                            data-bs-toggle="modal" data-bs-target="#assignModal"
+                            data-lead-id="{{ lead.id }}">
+                        <i class="bi bi-arrow-right-circle me-2"></i>Assign
+                    </button>
+                </li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                    <form method="post" action="{% url 'super_admin:lead_update' lead.id %}"
+                          hx-post="{% url 'super_admin:lead_update' lead.id %}"
+                          hx-target="#lead-row-{{ lead.id }}" hx-swap="outerHTML">
+                        {% csrf_token %}
+                        <input type="hidden" name="status" value="REJECTED">
+                        <button type="submit" class="dropdown-item text-danger">
+                            <i class="bi bi-x-circle me-2"></i>Reject
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </td>
+</tr>

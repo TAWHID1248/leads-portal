@@ -1,0 +1,105 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}LeadPortal{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/portal.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+
+    {% include 'partials/_topbar.html' %}
+
+    <div class="d-flex" style="padding-top: var(--portal-topbar-height);">
+        <nav id="portalSidebar" class="portal-sidebar">
+            {% block sidebar %}{% endblock %}
+        </nav>
+
+        <main class="portal-content flex-grow-1">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    {% block modals %}{% endblock %}
+
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" id="toastContainer" style="z-index: 9999;"></div>
+    {% include 'partials/_toast.html' %}
+
+    {% if user.is_authenticated %}
+    {# Session-timeout warning: warn at 13min idle, force /logout/ at 15min. #}
+    <div class="modal fade" id="sessionTimeoutModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Are you still there?</h5>
+                </div>
+                <div class="modal-body">
+                    Your session will expire in <strong id="sessionTimeoutCountdown">2:00</strong> for security.
+                    Click to stay signed in.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="sessionTimeoutStay">Stay signed in</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+    (function () {
+        const WARN_AFTER = 13 * 60 * 1000;
+        const LOGOUT_AFTER = 15 * 60 * 1000;
+        let lastActivity = Date.now();
+        let modalShown = false;
+
+        ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'].forEach((evt) =>
+            document.addEventListener(evt, () => {
+                lastActivity = Date.now();
+                if (modalShown) {
+                    const m = bootstrap.Modal.getInstance(document.getElementById('sessionTimeoutModal'));
+                    if (m) m.hide();
+                    modalShown = false;
+                }
+            }, { passive: true })
+        );
+
+        document.getElementById('sessionTimeoutStay').addEventListener('click', () => {
+            lastActivity = Date.now();
+            const m = bootstrap.Modal.getInstance(document.getElementById('sessionTimeoutModal'));
+            if (m) m.hide();
+            modalShown = false;
+            // Touch the server so the session timestamp updates.
+            fetch("{% url 'notifications:unread_count' %}", { credentials: 'same-origin' });
+        });
+
+        setInterval(() => {
+            const idle = Date.now() - lastActivity;
+            if (idle >= LOGOUT_AFTER) {
+                window.location.href = '/logout/';
+                return;
+            }
+            if (idle >= WARN_AFTER && !modalShown) {
+                const m = bootstrap.Modal.getOrCreateInstance(document.getElementById('sessionTimeoutModal'));
+                m.show();
+                modalShown = true;
+            }
+            if (modalShown) {
+                const remaining = Math.max(0, LOGOUT_AFTER - idle);
+                const m = Math.floor(remaining / 60000);
+                const s = String(Math.floor((remaining % 60000) / 1000)).padStart(2, '0');
+                const el = document.getElementById('sessionTimeoutCountdown');
+                if (el) el.textContent = `${m}:${s}`;
+            }
+        }, 5000);
+    })();
+    </script>
+    {% endif %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script src="{% static 'js/portal.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

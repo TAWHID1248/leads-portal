@@ -1,0 +1,58 @@
+{% load portal_tags %}
+<div class="modal fade" id="buyLeadsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="buyLeadsForm" onsubmit="return false;">
+                {% csrf_token %}
+                <input type="hidden" id="niche" name="niche">
+                <div class="modal-header">
+                    <h5 class="modal-title">Buy <span id="nicheLabel"></span> leads</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="small text-muted mb-2">
+                        Shared <strong id="sharedPrice">$0</strong> / Exclusive <strong id="exclusivePrice">$0</strong> per lead
+                    </div>
+
+                    <div id="step-qty">
+                        <label class="form-label small fw-semibold">Quantity</label>
+                        <input type="number" id="quantity" name="quantity" min="1" value="10" class="form-control" required>
+                    </div>
+
+                    <div id="step-options" class="d-none">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="exclusive" name="exclusive">
+                            <label class="form-check-label" for="exclusive">Exclusive leads (not shared with other clients)</label>
+                        </div>
+                        <label class="form-label small fw-semibold">State filter (optional)</label>
+                        <input type="text" name="state" class="form-control" placeholder="e.g. TX">
+                    </div>
+
+                    <div id="step-payment" class="d-none">
+                        <label class="form-label small fw-semibold">Payment method</label>
+                        <select name="payment_method" class="form-select">
+                            <option value="wallet">Wallet</option>
+                            <option value="stripe">Stripe (card)</option>
+                        </select>
+                    </div>
+
+                    <div id="step-confirm" class="d-none">
+                        <h6>Review</h6>
+                        <table class="table table-sm">
+                            <tr><td class="text-muted">Niche</td><td id="summaryNiche"></td></tr>
+                            <tr><td class="text-muted">Quantity</td><td id="summaryQty"></td></tr>
+                            <tr><td class="text-muted">Price / lead</td><td id="summaryPrice"></td></tr>
+                            <tr><td class="text-muted">Total</td><td><strong id="summaryTotal"></strong></td></tr>
+                        </table>
+                    </div>
+
+                    <div id="buyError" class="small text-danger mt-2"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link text-secondary" id="buyPrev">Back</button>
+                    <button type="button" class="btn btn-primary" id="buyNext">Next</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

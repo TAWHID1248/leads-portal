@@ -1,0 +1,5 @@
+Hi {{ user.first_name|default:user.email }},
+
+We've credited ${{ amount }} to the LeadPortal wallet for {{ client.company_name }}.
+
+— The LeadPortal team

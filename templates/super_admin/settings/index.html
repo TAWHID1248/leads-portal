@@ -1,0 +1,145 @@
+{% extends 'super_admin/base.html' %}
+{% load portal_tags %}
+
+{% block title %}Settings | LeadPortal{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-3">Settings</h1>
+
+<ul class="nav nav-tabs mb-3" role="tablist">
+    <li class="nav-item"><button class="nav-link {% if active_tab == 'pricing' %}active{% endif %}" data-bs-toggle="tab" data-bs-target="#tab-pricing">Pricing</button></li>
+    <li class="nav-item"><button class="nav-link {% if active_tab == 'api' %}active{% endif %}" data-bs-toggle="tab" data-bs-target="#tab-api">API Keys</button></li>
+    <li class="nav-item"><button class="nav-link {% if active_tab == 'integrations' %}active{% endif %}" data-bs-toggle="tab" data-bs-target="#tab-integrations">Integrations</button></li>
+    <li class="nav-item"><button class="nav-link {% if active_tab == 'system' %}active{% endif %}" data-bs-toggle="tab" data-bs-target="#tab-system">System config</button></li>
+</ul>
+
+<div class="tab-content">
+
+    <div class="tab-pane fade {% if active_tab == 'pricing' %}show active{% endif %}" id="tab-pricing">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="mb-3">Default pricing per niche</h6>
+                <table class="table table-sm align-middle mb-0">
+                    <thead class="small text-muted"><tr><th>Setting</th><th style="width: 220px;">Value</th><th class="text-end">Type</th></tr></thead>
+                    <tbody>
+                        {% for s in pricing %}
+                        <tr>
+                            <td>
+                                <code>{{ s.key }}</code><br>
+                                <span class="small text-muted">{{ s.description }}</span>
+                            </td>
+                            <td>
+                                <form method="post" action="{% url 'super_admin:settings_update' %}" class="d-flex gap-2">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="key" value="{{ s.key }}">
+                                    <input type="hidden" name="tab" value="pricing">
+                                    <input type="text" name="value" value="{{ s.value }}" class="form-control form-control-sm">
+                                    <button type="submit" class="btn btn-sm btn-primary">Save</button>
+                                </form>
+                            </td>
+                            <td class="text-end small text-muted">{{ s.value_type }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-pane fade {% if active_tab == 'api' %}show active{% endif %}" id="tab-api">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="mb-3">Lead ingest API key</h6>
+                <p class="small text-muted">Sent by the WordPress plugin in the <code>X-API-KEY</code> header. Regenerating invalidates the previous key.</p>
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <code class="px-3 py-2 rounded" style="background: #F3F4F6;">{{ ingest_display|default:"(not configured)" }}</code>
+                    <button type="button" class="btn btn-sm btn-link"
+                            data-copy="{{ ingest.value }}" title="Copy full key">
+                        <i class="bi bi-clipboard"></i> Copy full key
+                    </button>
+                </div>
+                <form method="post" action="{% url 'super_admin:settings_regenerate_ingest_key' %}"
+                      onsubmit="return confirm('Regenerate the ingest API key? Existing WordPress configurations will start failing until updated.');">
+                    {% csrf_token %}
+                    <input type="hidden" name="confirm" value="yes">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">Regenerate</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-body">
+                <h6 class="mb-3">Third-party keys (set via env)</h6>
+                <p class="small text-muted mb-0">
+                    SENDGRID_API_KEY, STRIPE_SECRET_KEY, TWILIO_AUTH_TOKEN, etc.
+                    Edit your <code>.env</code> file and restart the application to rotate.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-pane fade {% if active_tab == 'integrations' %}show active{% endif %}" id="tab-integrations">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="mb-3">Integration status</h6>
+                <table class="table table-sm mb-0">
+                    <thead class="small text-muted"><tr><th>Service</th><th>Status</th><th>Detail</th></tr></thead>
+                    <tbody>
+                        {% for it in integrations %}
+                        <tr>
+                            <td>{{ it.name }}</td>
+                            <td>
+                                {% if it.configured %}
+                                <span class="badge bg-success">Configured</span>
+                                {% else %}
+                                <span class="badge bg-secondary">Not configured</span>
+                                {% endif %}
+                            </td>
+                            <td class="small text-muted">{{ it.detail }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-pane fade {% if active_tab == 'system' %}show active{% endif %}" id="tab-system">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="mb-3">System configuration</h6>
+                <table class="table table-sm align-middle mb-0">
+                    <thead class="small text-muted"><tr><th>Setting</th><th style="width: 240px;">Value</th></tr></thead>
+                    <tbody>
+                        {% for s in system %}
+                        <tr>
+                            <td>
+                                <code>{{ s.key }}</code><br>
+                                <span class="small text-muted">{{ s.description }}</span>
+                            </td>
+                            <td>
+                                <form method="post" action="{% url 'super_admin:settings_update' %}" class="d-flex gap-2">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="key" value="{{ s.key }}">
+                                    <input type="hidden" name="tab" value="system">
+                                    {% if s.value_type == 'bool' %}
+                                    <select name="value" class="form-select form-select-sm">
+                                        <option value="true" {% if s.get_value %}selected{% endif %}>true</option>
+                                        <option value="false" {% if not s.get_value %}selected{% endif %}>false</option>
+                                    </select>
+                                    {% else %}
+                                    <input type="text" name="value" value="{{ s.value }}" class="form-control form-control-sm">
+                                    {% endif %}
+                                    <button type="submit" class="btn btn-sm btn-primary">Save</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,11 @@
+Hi {{ user.first_name|default:user.email }},
+
+Your LeadPortal client account for {{ client.company_name }} is ready.
+
+Login URL:  {{ login_url }}
+Email:      {{ user.email }}
+Password:   {{ temp_password }}
+
+After signing in, please change your password from your profile.
+
+— The LeadPortal team

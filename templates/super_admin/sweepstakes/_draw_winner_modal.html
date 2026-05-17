@@ -1,0 +1,26 @@
+<div class="modal fade" id="drawModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="{% url 'super_admin:sweepstakes_draw' sweepstakes.id %}">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title">Draw a winner</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Pick a random winner from <strong>{{ entries_total }} entries</strong> in <strong>{{ sweepstakes.title }}</strong>.</p>
+                    <ul class="small text-muted mb-0">
+                        <li>Entries must match the campaign niche and target state (if set).</li>
+                        <li>Entrants must be at least {{ sweepstakes.min_age }} years old (when DOB is known).</li>
+                        <li>Leads who already won another sweepstakes are excluded.</li>
+                        <li>The sweepstakes will transition to <strong>DRAWN</strong>.</li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link text-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-warning">Draw winner</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

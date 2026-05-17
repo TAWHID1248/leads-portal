@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --portal-primary: #0F766E;
+        --portal-primary-hover: #115E59;
+    }
+</style>
+{% endblock %}
+
+{% block sidebar %}
+<div class="sidebar-section">Agent</div>
+<a href="/agent/dashboard/" class="sidebar-link{% if request.path == '/agent/dashboard/' %} active{% endif %}">
+    <i class="bi bi-speedometer2"></i><span>Dashboard</span>
+</a>
+<a href="/agent/leads/" class="sidebar-link{% if '/agent/leads/' in request.path %} active{% endif %}">
+    <i class="bi bi-funnel"></i><span>Leads</span>
+</a>
+<a href="/agent/calls/" class="sidebar-link{% if '/agent/calls/' in request.path %} active{% endif %}">
+    <i class="bi bi-telephone"></i><span>Calls</span>
+</a>
+<a href="/agent/targets/" class="sidebar-link{% if '/agent/targets/' in request.path %} active{% endif %}">
+    <i class="bi bi-bullseye"></i><span>Targets</span>
+</a>
+{% endblock %}

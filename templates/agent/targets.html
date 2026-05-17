@@ -1,0 +1,81 @@
+{% extends 'agent/base.html' %}
+{% load portal_tags %}
+
+{% block title %}Targets | LeadPortal{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-3">Targets</h1>
+
+<div class="row g-3 mb-3">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body text-center">
+                <h6 class="mb-2">Leads this week</h6>
+                <svg viewBox="0 0 200 110" width="220" height="120" role="img" aria-label="Leads gauge">
+                    <path d="M10,100 A90,90 0 0 1 190,100" fill="none" stroke="#E5E7EB" stroke-width="14"/>
+                    <path d="M10,100 A90,90 0 0 1 190,100" fill="none" stroke="var(--portal-primary)" stroke-width="14"
+                          stroke-dasharray="{{ leads_gauge.dash }} {{ leads_gauge.gap }}"/>
+                    <text x="100" y="92" text-anchor="middle" font-size="20" font-weight="700" fill="#1E1B2E">{{ leads_gauge.percent_label }}</text>
+                </svg>
+                <p class="mb-0 small text-muted"><strong>{{ leads_done }}</strong> / {{ leads_target }} leads</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body text-center">
+                <h6 class="mb-2">Revenue this week</h6>
+                <svg viewBox="0 0 200 110" width="220" height="120" role="img" aria-label="Revenue gauge">
+                    <path d="M10,100 A90,90 0 0 1 190,100" fill="none" stroke="#E5E7EB" stroke-width="14"/>
+                    <path d="M10,100 A90,90 0 0 1 190,100" fill="none" stroke="#10B981" stroke-width="14"
+                          stroke-dasharray="{{ revenue_gauge.dash }} {{ revenue_gauge.gap }}"/>
+                    <text x="100" y="92" text-anchor="middle" font-size="20" font-weight="700" fill="#1E1B2E">{{ revenue_gauge.percent_label }}</text>
+                </svg>
+                <p class="mb-0 small text-muted"><strong>{{ revenue_done|money }}</strong> / {{ revenue_target|money }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <h6 class="mb-3">This week — calls by day</h6>
+        <table class="table table-sm mb-0 align-middle">
+            <thead class="small text-muted">
+                <tr>
+                    <th>Day</th><th class="text-end">Total</th>
+                    {% for o in outcomes_in_order %}<th class="text-end small">{{ outcome_labels|get_item:o|default:o }}</th>{% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for d in days %}
+                <tr>
+                    <td>{{ d.date|date:"D M j" }}</td>
+                    <td class="text-end">{{ d.total }}</td>
+                    {% for o in outcomes_in_order %}<td class="text-end small text-muted">{{ d.outcomes|get_item:o|default:0 }}</td>{% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <h6 class="mb-3">This month</h6>
+        <dl class="row mb-0 small">
+            <dt class="col-5 text-muted fw-normal">Total calls</dt><dd class="col-7">{{ monthly_calls_total }}</dd>
+            <dt class="col-5 text-muted fw-normal">Sold</dt><dd class="col-7">{{ monthly_sold_count }}</dd>
+            <dt class="col-5 text-muted fw-normal">Revenue (sold)</dt><dd class="col-7">{{ monthly_revenue|money }}</dd>
+            <dt class="col-5 text-muted fw-normal">Commission earned</dt><dd class="col-7">{{ monthly_commission|money }}</dd>
+        </dl>
+        <hr>
+        <h6 class="small text-muted">Outcome breakdown</h6>
+        <ul class="list-inline mb-0">
+            {% for o in monthly_outcomes %}
+            <li class="list-inline-item small me-3"><strong>{{ o.count }}</strong> {{ outcome_labels|get_item:o.outcome|default:o.outcome }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

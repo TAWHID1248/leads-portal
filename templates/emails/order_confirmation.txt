@@ -1,0 +1,14 @@
+Hi {{ user.first_name|default:user.email }},
+
+Your LeadPortal order has been confirmed.
+
+Order #{{ order.id }}
+Niche:    {{ order.niche }}
+Quantity: {{ order.quantity }}
+Price:    ${{ order.price_per_lead }} per lead
+Total:    ${{ order.total_amount }}
+Status:   {{ order.get_status_display }}
+
+Leads have been allocated to your account and are available now.
+
+— The LeadPortal team

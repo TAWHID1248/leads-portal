@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --portal-primary: #EA580C;
+        --portal-primary-hover: #C2410C;
+    }
+</style>
+{% endblock %}
+
+{% block sidebar %}
+<div class="sidebar-section">Client</div>
+<a href="/client/dashboard/" class="sidebar-link{% if request.path == '/client/dashboard/' %} active{% endif %}">
+    <i class="bi bi-speedometer2"></i><span>Dashboard</span>
+</a>
+<a href="/client/leads/" class="sidebar-link{% if '/client/leads/' in request.path %} active{% endif %}">
+    <i class="bi bi-funnel"></i><span>My Leads</span>
+</a>
+<a href="/client/pricing/" class="sidebar-link{% if '/client/pricing/' in request.path %} active{% endif %}">
+    <i class="bi bi-tag"></i><span>Pricing</span>
+</a>
+<a href="/client/orders/" class="sidebar-link{% if '/client/orders/' in request.path %} active{% endif %}">
+    <i class="bi bi-bag"></i><span>Orders</span>
+</a>
+<a href="/client/subscriptions/" class="sidebar-link{% if '/client/subscriptions/' in request.path %} active{% endif %}">
+    <i class="bi bi-arrow-repeat"></i><span>Subscriptions</span>
+</a>
+<a href="/client/wallet/" class="sidebar-link{% if '/client/wallet/' in request.path %} active{% endif %}">
+    <i class="bi bi-wallet2"></i><span>Wallet</span>
+</a>
+<a href="/client/replacements/" class="sidebar-link{% if '/client/replacements/' in request.path %} active{% endif %}">
+    <i class="bi bi-arrow-repeat"></i><span>Replacements</span>
+</a>
+<a href="/client/invoices/" class="sidebar-link{% if '/client/invoices/' in request.path %} active{% endif %}">
+    <i class="bi bi-receipt"></i><span>Invoices</span>
+</a>
+{% endblock %}

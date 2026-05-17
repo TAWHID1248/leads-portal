@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --portal-primary: #7C3AED;
+        --portal-primary-hover: #6D28D9;
+    }
+</style>
+{% endblock %}
+
+{% block sidebar %}
+<div class="sidebar-section">Super Admin</div>
+<a href="/super/dashboard/" class="sidebar-link{% if request.path == '/super/dashboard/' %} active{% endif %}">
+    <i class="bi bi-speedometer2"></i><span>Dashboard</span>
+</a>
+<a href="/super/users/" class="sidebar-link{% if '/super/users/' in request.path %} active{% endif %}">
+    <i class="bi bi-people"></i><span>Users</span>
+</a>
+<a href="/super/leads/" class="sidebar-link{% if '/super/leads/' in request.path %} active{% endif %}">
+    <i class="bi bi-funnel"></i><span>Leads</span>
+</a>
+<a href="/super/clients/" class="sidebar-link{% if '/super/clients/' in request.path %} active{% endif %}">
+    <i class="bi bi-briefcase"></i><span>Clients</span>
+</a>
+<a href="/super/agents/" class="sidebar-link{% if '/super/agents/' in request.path %} active{% endif %}">
+    <i class="bi bi-person-badge"></i><span>Agents</span>
+</a>
+<a href="/super/replacements/" class="sidebar-link{% if '/super/replacements/' in request.path %} active{% endif %}">
+    <i class="bi bi-arrow-repeat"></i><span>Replacements</span>
+</a>
+<a href="/super/sweepstakes/" class="sidebar-link{% if '/super/sweepstakes/' in request.path %} active{% endif %}">
+    <i class="bi bi-gift"></i><span>Sweepstakes</span>
+</a>
+<a href="/super/billing/" class="sidebar-link{% if '/super/billing/' in request.path %} active{% endif %}">
+    <i class="bi bi-receipt"></i><span>Billing</span>
+</a>
+<a href="/super/settings/" class="sidebar-link{% if '/super/settings/' in request.path %} active{% endif %}">
+    <i class="bi bi-gear"></i><span>Settings</span>
+</a>
+{% endblock %}

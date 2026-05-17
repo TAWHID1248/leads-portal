@@ -1,0 +1,38 @@
+<div class="dropdown">
+    <button class="btn btn-link p-0 text-decoration-none dropdown-toggle d-flex align-items-center gap-2"
+            type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="User menu">
+        {% if user.avatar_url %}
+            <img src="{{ user.avatar_url }}" alt="Avatar"
+                 class="rounded-circle object-fit-cover"
+                 width="34" height="34">
+        {% else %}
+            <div class="portal-avatar rounded-circle d-flex align-items-center justify-content-center
+                        text-white fw-bold flex-shrink-0"
+                 style="width:34px;height:34px;background:var(--portal-primary);font-size:0.75rem;">
+                {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+            </div>
+        {% endif %}
+        <span class="d-none d-md-inline text-dark small fw-semibold">
+            {{ user.get_full_name|default:user.email }}
+        </span>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="min-width:200px;">
+        <li>
+            <span class="dropdown-item-text small text-muted text-truncate d-block px-3 py-1"
+                  style="max-width:200px;">{{ user.email }}</span>
+        </li>
+        <li><span class="badge ms-3 mb-1" style="background:var(--portal-primary);font-size:0.65rem;">
+            {{ user.get_role_display }}
+        </span></li>
+        <li><hr class="dropdown-divider my-1"></li>
+        <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Profile</a></li>
+        <li>
+            <form method="post" action="/logout/">
+                {% csrf_token %}
+                <button type="submit" class="dropdown-item text-danger">
+                    <i class="bi bi-box-arrow-right me-2"></i>Logout
+                </button>
+            </form>
+        </li>
+    </ul>
+</div>

@@ -1,0 +1,13 @@
+<div class="text-center py-5 my-3">
+    <i class="{{ icon|default:'bi bi-inbox' }} fs-1 text-muted d-block mb-3"></i>
+    <h5 class="text-muted fw-semibold mb-1">{{ title|default:"Nothing here yet" }}</h5>
+    {% if description %}
+    <p class="text-muted small mb-3">{{ description }}</p>
+    {% endif %}
+    {% if action_url and action_label %}
+    <a href="{{ action_url }}" class="btn btn-primary btn-sm mt-1">
+        {% if action_icon %}<i class="{{ action_icon }} me-1"></i>{% endif %}
+        {{ action_label }}
+    </a>
+    {% endif %}
+</div>

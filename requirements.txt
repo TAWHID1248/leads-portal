@@ -1,0 +1,16 @@
+Django>=5.0
+djangorestframework
+python-decouple
+dj-database-url
+psycopg[binary]
+django-extensions
+gunicorn
+whitenoise
+django-htmx
+django-filter
+stripe
+celery
+redis
+django-storages
+boto3
+Pillow

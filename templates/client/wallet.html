@@ -1,0 +1,58 @@
+{% extends 'client/base.html' %}
+{% load portal_tags %}
+
+{% block title %}Wallet | LeadPortal{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <h1 class="h3 mb-0">Wallet</h1>
+    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#topupModal">
+        <i class="bi bi-plus-circle me-1"></i> Top up
+    </button>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="kpi-card">
+            <div class="kpi-label">Balance</div>
+            <div class="kpi-value">{{ wallet.balance|default:0|money }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <h6 class="mb-3">Transaction history</h6>
+        {% if transactions %}
+        <table class="table table-sm mb-0 align-middle">
+            <thead class="small text-muted"><tr><th>Date</th><th>Type</th><th>Description</th><th class="text-end">Amount</th><th class="text-end">Balance after</th></tr></thead>
+            <tbody>
+                {% for tx in transactions %}
+                <tr>
+                    <td class="small">{{ tx.created_at|date:"M j, Y H:i" }}</td>
+                    <td><span class="badge bg-light text-dark border">{{ tx.get_tx_type_display }}</span></td>
+                    <td class="small">{{ tx.description }}</td>
+                    <td class="text-end{% if tx.amount < 0 %} text-danger{% else %} text-success{% endif %}">
+                        {{ tx.amount|money }}
+                    </td>
+                    <td class="text-end small text-muted">{{ tx.balance_after|money }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        {% include 'partials/_empty_state.html' with title="No transactions yet" description="Top up your wallet to start purchasing leads." %}
+        {% endif %}
+    </div>
+</div>
+
+{% include 'client/_topup_modal.html' %}
+{% endblock %}
+
+{% block extra_js %}
+{% if stripe_configured %}
+<script src="https://js.stripe.com/v3/"></script>
+<script>window.PORTAL_STRIPE_KEY = "{{ stripe_publishable_key }}";</script>
+<script src="{% load static %}{% static 'js/stripe.js' %}"></script>
+{% endif %}
+{% endblock %}

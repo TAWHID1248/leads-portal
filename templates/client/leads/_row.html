@@ -1,0 +1,70 @@
+{% load portal_tags %}
+{% with lead=a.lead %}
+<tr id="alloc-row-{{ a.id }}"
+    {% if a.is_new_within_48h %}class="new-lead"{% endif %}>
+    <td class="ps-3 small text-muted">#{{ a.id }}</td>
+    <td>
+        <button type="button"
+                class="btn btn-link btn-sm p-0 text-decoration-none fw-semibold"
+                hx-get="{% url 'client:lead_drawer' a.id %}"
+                hx-target="#leadDrawerBody">
+            {{ lead.full_name|default:"—" }}
+        </button>
+    </td>
+    <td>
+        {% if lead.phone %}
+        <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none"
+                data-copy="{{ lead.phone }}" title="Copy phone">{{ lead.phone }}</button>
+        {% else %}<span class="text-muted">—</span>{% endif %}
+    </td>
+    <td>
+        {% if lead.email %}
+        <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none small"
+                data-copy="{{ lead.email }}" title="Copy email">{{ lead.email }}</button>
+        {% else %}<span class="text-muted">—</span>{% endif %}
+    </td>
+    <td class="small">{{ lead.state|default:"—" }}</td>
+    <td class="small">{{ lead.zip_code|default:"—" }}</td>
+    <td>{% niche_badge lead.niche %}</td>
+    <td class="small">
+        {% if 'solar' in lead.niche %}
+            {% if lead.is_homeowner is not None %}Homeowner: {{ lead.is_homeowner|yesno:"Yes,No" }}<br>{% endif %}
+            {% if lead.monthly_bill %}Bill: {{ lead.monthly_bill|money }}<br>{% endif %}
+            {% if lead.credit_score %}Credit: {{ lead.credit_score }}{% endif %}
+        {% else %}
+            {% if lead.annual_income %}Income: {{ lead.annual_income|money }}<br>{% endif %}
+            {% if lead.currently_insured is not None %}Insured: {{ lead.currently_insured|yesno:"Yes,No" }}{% endif %}
+        {% endif %}
+    </td>
+    <td class="small text-muted">
+        {{ a.allocated_at|date:"M j, Y" }}
+        {% if a.is_new_within_48h %}
+        <span class="badge bg-success ms-1">NEW</span>
+        {% endif %}
+    </td>
+    <td>
+        <form hx-post="{% url 'client:lead_update_status' a.id %}"
+              hx-target="#alloc-row-{{ a.id }}"
+              hx-swap="outerHTML"
+              hx-trigger="change from:select"
+              class="m-0">
+            {% csrf_token %}
+            <select name="client_status" class="form-select form-select-sm" style="min-width: 130px;">
+                {% for v,l in client_statuses %}
+                <option value="{{ v }}" {% if a.client_status == v %}selected{% endif %}>{{ l }}</option>
+                {% endfor %}
+            </select>
+        </form>
+    </td>
+    <td class="pe-3 text-end">
+        {% if a.replacement_eligible %}
+        <button type="button" class="btn btn-sm btn-outline-warning"
+                data-bs-toggle="modal" data-bs-target="#replaceModal"
+                data-alloc-id="{{ a.id }}"
+                title="Request replacement (within {{ replacement_window_days }}-day window)">
+            <i class="bi bi-arrow-repeat"></i>
+        </button>
+        {% endif %}
+    </td>
+</tr>
+{% endwith %}

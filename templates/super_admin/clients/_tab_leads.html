@@ -1,0 +1,27 @@
+{% load portal_tags %}
+{% if allocations %}
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-sm table-hover mb-0 align-middle">
+            <thead class="small text-muted">
+                <tr><th class="ps-3">#</th><th>Name</th><th>Niche</th><th>Price</th><th>Status</th><th>Client status</th><th class="pe-3">Allocated</th></tr>
+            </thead>
+            <tbody>
+                {% for a in allocations %}
+                <tr>
+                    <td class="ps-3 small text-muted">#{{ a.lead_id }}</td>
+                    <td>{{ a.lead.full_name|default:"—" }}</td>
+                    <td>{% niche_badge a.lead.niche %}</td>
+                    <td>{{ a.price_per_lead|money }}</td>
+                    <td>{% status_badge a.status %}</td>
+                    <td><span class="badge bg-light text-dark border">{{ a.get_client_status_display }}</span></td>
+                    <td class="pe-3 small text-muted">{{ a.allocated_at|time_ago }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+{% include 'partials/_empty_state.html' with title="No leads allocated" %}
+{% endif %}

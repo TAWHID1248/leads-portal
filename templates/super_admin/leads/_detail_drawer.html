@@ -1,0 +1,107 @@
+{% load portal_tags %}
+<div class="offcanvas-header border-bottom">
+    <div>
+        <h5 class="offcanvas-title mb-1">{{ lead.full_name|default:"Lead" }}</h5>
+        <div class="small text-muted">
+            #{{ lead.id }} · {% niche_badge lead.niche %} {% status_badge lead.status %}
+        </div>
+    </div>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+</div>
+<div class="offcanvas-body">
+    <ul class="nav nav-tabs small mb-3" id="leadDrawerTabs" role="tablist">
+        <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-details" type="button">Details</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-source" type="button">Source</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-consent" type="button">Consent</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-allocations" type="button">Allocations</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-timeline" type="button">Timeline</button></li>
+    </ul>
+
+    <div class="tab-content small">
+        <div class="tab-pane fade show active" id="tab-details">
+            <dl class="row mb-0">
+                <dt class="col-5 text-muted fw-normal">Name</dt><dd class="col-7">{{ lead.full_name|default:"—" }}</dd>
+                <dt class="col-5 text-muted fw-normal">Email</dt><dd class="col-7">{{ lead.email|default:"—" }}</dd>
+                <dt class="col-5 text-muted fw-normal">Phone</dt><dd class="col-7">{{ lead.phone|default:"—" }}</dd>
+                <dt class="col-5 text-muted fw-normal">Address</dt><dd class="col-7">{{ lead.address|default:"—" }}</dd>
+                <dt class="col-5 text-muted fw-normal">City / State / Zip</dt>
+                <dd class="col-7">{{ lead.city|default:"—" }}, {{ lead.state|default:"—" }} {{ lead.zip_code }}</dd>
+                <dt class="col-5 text-muted fw-normal">Date of birth</dt><dd class="col-7">{{ lead.date_of_birth|default:"—" }}</dd>
+                <dt class="col-5 text-muted fw-normal">Homeowner</dt><dd class="col-7">{{ lead.is_homeowner|default:"—" }}</dd>
+                <dt class="col-5 text-muted fw-normal">Monthly bill</dt><dd class="col-7">{{ lead.monthly_bill|money }}</dd>
+                <dt class="col-5 text-muted fw-normal">Credit</dt><dd class="col-7">{{ lead.credit_score|default:"—" }}</dd>
+                <dt class="col-5 text-muted fw-normal">Quality</dt><dd class="col-7">{% quality_badge lead.quality_score %}</dd>
+            </dl>
+        </div>
+
+        <div class="tab-pane fade" id="tab-source">
+            <dl class="row mb-0">
+                <dt class="col-5 text-muted fw-normal">Source type</dt><dd class="col-7">{{ lead.source_type|default:"—" }}</dd>
+                <dt class="col-5 text-muted fw-normal">Campaign ID</dt><dd class="col-7">{{ lead.campaign_id|default:"—" }}</dd>
+                <dt class="col-5 text-muted fw-normal">Ad set ID</dt><dd class="col-7">{{ lead.ad_set_id|default:"—" }}</dd>
+                <dt class="col-5 text-muted fw-normal">Source page</dt><dd class="col-7 text-break">{{ lead.source_page|default:"—" }}</dd>
+                <dt class="col-5 text-muted fw-normal">UTM source</dt><dd class="col-7">{{ lead.utm_source|default:"—" }}</dd>
+                <dt class="col-5 text-muted fw-normal">UTM medium</dt><dd class="col-7">{{ lead.utm_medium|default:"—" }}</dd>
+                <dt class="col-5 text-muted fw-normal">UTM campaign</dt><dd class="col-7">{{ lead.utm_campaign|default:"—" }}</dd>
+                <dt class="col-5 text-muted fw-normal">UTM content</dt><dd class="col-7">{{ lead.utm_content|default:"—" }}</dd>
+                <dt class="col-5 text-muted fw-normal">UTM term</dt><dd class="col-7">{{ lead.utm_term|default:"—" }}</dd>
+                <dt class="col-5 text-muted fw-normal">IP</dt><dd class="col-7">{{ lead.ip_address|default:"—" }}</dd>
+                <dt class="col-5 text-muted fw-normal">User agent</dt><dd class="col-7 small text-break">{{ lead.user_agent|default:"—" }}</dd>
+            </dl>
+        </div>
+
+        <div class="tab-pane fade" id="tab-consent">
+            <dl class="row mb-0">
+                <dt class="col-5 text-muted fw-normal">TCPA consent</dt><dd class="col-7">{{ lead.tcpa_consent_text|default:"—" }}</dd>
+                <dt class="col-5 text-muted fw-normal">Consent at</dt><dd class="col-7">{{ lead.tcpa_consent_at|default:"—" }}</dd>
+                <dt class="col-5 text-muted fw-normal">TrustedForm cert</dt>
+                <dd class="col-7 text-break">
+                    {% if lead.trusted_form_cert_url %}<a href="{{ lead.trusted_form_cert_url }}" target="_blank">{{ lead.trusted_form_cert_url }}</a>{% else %}—{% endif %}
+                </dd>
+                <dt class="col-5 text-muted fw-normal">On DNC</dt><dd class="col-7">{{ lead.is_on_dnc }}</dd>
+                <dt class="col-5 text-muted fw-normal">DNC checked at</dt><dd class="col-7">{{ lead.dnc_checked_at|default:"—" }}</dd>
+            </dl>
+        </div>
+
+        <div class="tab-pane fade" id="tab-allocations">
+            {% if allocations %}
+            <table class="table table-sm">
+                <thead class="text-muted"><tr><th>Client</th><th>Price</th><th>Status</th><th>Allocated</th></tr></thead>
+                <tbody>
+                    {% for a in allocations %}
+                    <tr>
+                        <td>{{ a.client.company_name }}</td>
+                        <td>{{ a.price_per_lead|money }}</td>
+                        <td>{{ a.get_status_display }}</td>
+                        <td class="text-muted small">{{ a.allocated_at|time_ago }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="text-muted mb-0">No allocations yet.</p>
+            {% endif %}
+            <button type="button" class="btn btn-sm btn-primary mt-2"
+                    data-bs-toggle="modal" data-bs-target="#assignModal"
+                    data-lead-id="{{ lead.id }}">
+                <i class="bi bi-arrow-right-circle me-1"></i> Assign to client
+            </button>
+        </div>
+
+        <div class="tab-pane fade" id="tab-timeline">
+            {% if activity %}
+            <ul class="list-unstyled mb-0">
+                {% for a in activity %}
+                <li class="border-start ps-3 mb-3" style="border-color: var(--portal-primary) !important;">
+                    <div class="fw-semibold">{{ a.action }}</div>
+                    <div class="small text-muted">{{ a.created_at|time_ago }}</div>
+                    {% if a.metadata %}<pre class="small text-muted mb-0">{{ a.metadata|safe }}</pre>{% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="text-muted mb-0">No activity recorded yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>

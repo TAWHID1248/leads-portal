@@ -1,0 +1,79 @@
+{% extends 'super_admin/base.html' %}
+
+{% block title %}{% if is_edit %}Edit{% else %}New{% endif %} sweepstakes | LeadPortal{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="small mb-2">
+    <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="{% url 'super_admin:sweepstakes_list' %}">Sweepstakes</a></li>
+        <li class="breadcrumb-item active">{% if is_edit %}Edit{% else %}New{% endif %}</li>
+    </ol>
+</nav>
+
+<div class="card" style="max-width: 720px;">
+    <div class="card-body p-4">
+        <h2 class="h4 mb-3">{% if is_edit %}Edit{% else %}New{% endif %} sweepstakes</h2>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row g-3">
+                <div class="col-12">
+                    <label class="form-label small fw-semibold mb-1">Title</label>
+                    <input type="text" name="title" class="form-control" required value="{{ sweepstakes.title|default:'' }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-semibold mb-1">Niche</label>
+                    <select name="niche" class="form-select" required>
+                        {% for v,l in niches %}<option value="{{ v }}" {% if v == sweepstakes.niche %}selected{% endif %}>{{ l }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-semibold mb-1">Status</label>
+                    <select name="status" class="form-select" required>
+                        {% for v,l in statuses %}<option value="{{ v }}" {% if v == sweepstakes.status %}selected{% endif %}>{{ l }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-semibold mb-1">Prize title</label>
+                    <input type="text" name="prize_title" class="form-control" required value="{{ sweepstakes.prize_title|default:'' }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-semibold mb-1">Prize value (USD)</label>
+                    <input type="number" step="0.01" name="prize_value" class="form-control" required value="{{ sweepstakes.prize_value|default:'' }}">
+                </div>
+                <div class="col-12">
+                    <label class="form-label small fw-semibold mb-1">Prize image</label>
+                    <input type="file" name="prize_image" class="form-control" accept="image/*">
+                </div>
+                <div class="col-12">
+                    <label class="form-label small fw-semibold mb-1">Official rules URL</label>
+                    <input type="url" name="official_rules_url" class="form-control" value="{{ sweepstakes.official_rules_url|default:'' }}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small fw-semibold mb-1">Start date</label>
+                    <input type="date" name="start_date" class="form-control" required value="{{ sweepstakes.start_date|date:'Y-m-d' }}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small fw-semibold mb-1">End date</label>
+                    <input type="date" name="end_date" class="form-control" required value="{{ sweepstakes.end_date|date:'Y-m-d' }}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small fw-semibold mb-1">Draw date</label>
+                    <input type="date" name="draw_date" class="form-control" required value="{{ sweepstakes.draw_date|date:'Y-m-d' }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-semibold mb-1">Target state (optional)</label>
+                    <input type="text" name="target_state" class="form-control" value="{{ sweepstakes.target_state|default:'' }}" maxlength="100">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-semibold mb-1">Minimum age</label>
+                    <input type="number" name="min_age" min="13" max="120" class="form-control" value="{{ sweepstakes.min_age|default:18 }}">
+                </div>
+            </div>
+            <div class="d-flex gap-2 mt-3">
+                <button type="submit" class="btn btn-primary">{% if is_edit %}Save changes{% else %}Create{% endif %}</button>
+                <a href="{% url 'super_admin:sweepstakes_list' %}" class="btn btn-link text-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% load portal_tags %}
+{% if activity %}
+<ul class="list-unstyled mb-0">
+    {% for a in activity %}
+    <li class="border-start ps-3 mb-3" style="border-color: var(--portal-primary) !important;">
+        <div class="fw-semibold">{{ a.action }}</div>
+        <div class="small text-muted">{{ a.created_at|time_ago }}{% if a.user %} · {{ a.user.email }}{% endif %}</div>
+        {% if a.metadata %}<pre class="small text-muted mb-0">{{ a.metadata }}</pre>{% endif %}
+    </li>
+    {% endfor %}
+</ul>
+{% else %}{% include 'partials/_empty_state.html' with title="No recorded activity" %}{% endif %}

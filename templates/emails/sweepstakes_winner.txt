@@ -1,0 +1,8 @@
+Congratulations {{ winner.first_name|default:winner.email }}!
+
+You've won the {{ sweepstakes.title }} sweepstakes.
+Prize: {{ sweepstakes.prize_title }} (value ${{ sweepstakes.prize_value }})
+
+We'll be in touch about prize delivery.
+
+— The LeadPortal team

@@ -1,0 +1,27 @@
+{% extends 'super_admin/base.html' %}
+
+{% block title %}New client | LeadPortal{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="small mb-2">
+    <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="{% url 'super_admin:client_list' %}">Clients</a></li>
+        <li class="breadcrumb-item active">New</li>
+    </ol>
+</nav>
+
+<div class="card" style="max-width: 720px;">
+    <div class="card-body p-4">
+        <h2 class="h4 mb-1">New client</h2>
+        <p class="text-muted small mb-4">Creates a User (role=CLIENT), Client profile, and Wallet.</p>
+        <form method="post">
+            {% csrf_token %}
+            {% include 'super_admin/clients/_form_fields.html' %}
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Create client</button>
+                <a href="{% url 'super_admin:client_list' %}" class="btn btn-link text-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

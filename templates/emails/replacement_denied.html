@@ -1,0 +1,11 @@
+<!doctype html>
+<html><body style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;color:#1e1b2e;line-height:1.5;">
+<div style="max-width:560px;margin:0 auto;padding:24px;">
+    <h2 style="color:#DC2626;margin:0 0 16px;">Replacement denied</h2>
+    <p>Hi {{ user.first_name|default:user.email }},</p>
+    <p>Your replacement request for lead <strong>#{{ original_lead.id }}</strong>
+       ({{ original_lead.full_name }}) was not approved.</p>
+    {% if reason_note %}<p><strong>Reason:</strong> {{ reason_note }}</p>{% endif %}
+    <p>If you believe this is in error, please reply to this email.</p>
+    <p>— The LeadPortal team</p>
+</div></body></html>

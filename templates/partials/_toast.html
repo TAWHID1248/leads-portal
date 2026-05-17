@@ -1,0 +1,12 @@
+{# Toasts are rendered dynamically by window.showToast(message, level) in portal.js #}
+{# Servers can trigger them via HX-Trigger: {"showToast": {"message": "...", "level": "success"}} #}
+{# Django messages are mapped to toasts below — include this in base.html if using messages framework #}
+{% if messages %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    {% for message in messages %}
+    window.showToast('{{ message|escapejs }}', '{{ message.tags|default:"success"|escapejs }}');
+    {% endfor %}
+});
+</script>
+{% endif %}

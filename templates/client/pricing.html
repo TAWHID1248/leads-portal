@@ -1,0 +1,120 @@
+{% extends 'client/base.html' %}
+{% load portal_tags %}
+
+{% block title %}Pricing | LeadPortal{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+        <h1 class="h3 mb-0">Pricing</h1>
+        <p class="text-muted small mb-0">Wallet balance: <strong>{{ wallet_balance|money }}</strong></p>
+    </div>
+</div>
+
+<div class="row g-3">
+    {% for c in cards %}
+    <div class="col-md-4 col-lg-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="mb-2">{% niche_badge c.value %}</div>
+                <h6 class="mb-3">{{ c.label }}</h6>
+                <dl class="row mb-3 small">
+                    <dt class="col-7 text-muted fw-normal">Shared / lead</dt>
+                    <dd class="col-5 text-end fw-semibold">{{ c.shared|money|default:"—" }}</dd>
+                    <dt class="col-7 text-muted fw-normal">Exclusive / lead</dt>
+                    <dd class="col-5 text-end fw-semibold">{{ c.exclusive|money|default:"—" }}</dd>
+                </dl>
+                <button type="button" class="btn btn-sm btn-primary w-100"
+                        data-bs-toggle="modal" data-bs-target="#buyLeadsModal"
+                        data-niche="{{ c.value }}" data-niche-label="{{ c.label }}"
+                        data-shared="{{ c.shared|default_if_none:'' }}"
+                        data-exclusive="{{ c.exclusive|default_if_none:'' }}">
+                    Buy leads
+                </button>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% include 'client/_buy_leads_modal.html' %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const buyModal = document.getElementById('buyLeadsModal');
+const buyForm = document.getElementById('buyLeadsForm');
+const stepStates = ['step-qty', 'step-options', 'step-payment', 'step-confirm'];
+let currentStep = 0;
+let currentPrice = 0;
+
+function showStep(i) {
+    stepStates.forEach((id, idx) => {
+        document.getElementById(id).classList.toggle('d-none', idx !== i);
+    });
+    document.getElementById('buyPrev').disabled = i === 0;
+    document.getElementById('buyNext').textContent = (i === stepStates.length - 1) ? 'Confirm' : 'Next';
+    currentStep = i;
+}
+
+buyModal.addEventListener('show.bs.modal', (evt) => {
+    const t = evt.relatedTarget;
+    if (!t) return;
+    buyForm.reset();
+    document.getElementById('niche').value = t.getAttribute('data-niche');
+    document.getElementById('nicheLabel').textContent = t.getAttribute('data-niche-label');
+    document.getElementById('sharedPrice').textContent = '$' + (t.getAttribute('data-shared') || '?');
+    document.getElementById('exclusivePrice').textContent = '$' + (t.getAttribute('data-exclusive') || '?');
+    currentPrice = parseFloat(t.getAttribute('data-shared') || '0');
+    document.getElementById('quantity').value = 10;
+    showStep(0);
+    updateSummary();
+});
+
+document.getElementById('exclusive').addEventListener('change', (evt) => {
+    const t = buyModal._lastTrigger || {};
+    const shared = parseFloat(buyForm.dataset.shared || '0');
+    const excl = parseFloat(buyForm.dataset.exclusive || '0');
+    currentPrice = evt.target.checked ? excl : shared;
+    updateSummary();
+});
+buyForm.addEventListener('change', updateSummary);
+buyForm.addEventListener('input', updateSummary);
+
+function updateSummary() {
+    const qty = parseInt(document.getElementById('quantity').value || '0', 10);
+    const exclusive = document.getElementById('exclusive').checked;
+    const shared = parseFloat(document.getElementById('sharedPrice').textContent.replace('$',''));
+    const excl = parseFloat(document.getElementById('exclusivePrice').textContent.replace('$',''));
+    currentPrice = exclusive ? excl : shared;
+    if (!isFinite(currentPrice)) currentPrice = 0;
+    document.getElementById('summaryNiche').textContent = document.getElementById('nicheLabel').textContent;
+    document.getElementById('summaryQty').textContent = qty;
+    document.getElementById('summaryPrice').textContent = '$' + currentPrice.toFixed(2);
+    document.getElementById('summaryTotal').textContent = '$' + (qty * currentPrice).toFixed(2);
+}
+
+document.getElementById('buyPrev').addEventListener('click', () => showStep(Math.max(0, currentStep - 1)));
+document.getElementById('buyNext').addEventListener('click', async () => {
+    if (currentStep < stepStates.length - 1) {
+        showStep(currentStep + 1);
+        return;
+    }
+    const fd = new FormData(buyForm);
+    fd.set('exclusive', document.getElementById('exclusive').checked ? 'true' : 'false');
+    const resp = await fetch('{% url "client:buy_leads" %}', {
+        method: 'POST',
+        headers: {'X-CSRFToken': fd.get('csrfmiddlewaretoken') || ''},
+        body: fd,
+    });
+    const j = await resp.json().catch(() => ({}));
+    if (resp.ok && j.ok) {
+        window.showToast('Order #' + j.order_id + ' — ' + j.allocations + ' leads allocated', 'success');
+        bootstrap.Modal.getInstance(buyModal).hide();
+        setTimeout(() => window.location.href = '{% url "client:orders" %}', 600);
+    } else {
+        document.getElementById('buyError').textContent = (j.error || 'Order failed.');
+    }
+});
+</script>
+{% endblock %}
