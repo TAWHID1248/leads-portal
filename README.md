@@ -223,3 +223,15 @@ python manage.py migrate --noinput
 celery -A config worker -l info
 celery -A config beat -l info
 ```
+
+
+ ┌──────────────────┬──────────────────────┬──────────────────┐
+  │       Role       │        Email         │     Password     │
+  ├──────────────────┼──────────────────────┼──────────────────┤
+  │ Super admin      │ admin@test.local     │ NewPassw0rd!9876 │                                                                                    
+  ├──────────────────┼──────────────────────┼──────────────────┤
+  │ Client           │ client@test.local    │ ClientPass!9876  │
+  │ Client (NewCorp) │ newclient@test.local │ mfKpTQq5CVuCY8Xp │
+  ├──────────────────┼──────────────────────┼──────────────────┤
+  │ Agent            │ agent1@test.local    │ AgentPass!1234   │
+  └──────────────────┴──────────────────────┴──────────────────┘

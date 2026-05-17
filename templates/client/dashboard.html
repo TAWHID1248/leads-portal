@@ -60,11 +60,16 @@
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const shortDate = (iso) => { const [y, m, d] = iso.split('-').map(Number); return MONTHS[m - 1] + ' ' + d; };
+const fullDate  = (iso) => { const [y, m, d] = iso.split('-').map(Number); return MONTHS[m - 1] + ' ' + d + ', ' + y; };
+
 fetch("{% url 'client:chart_data' %}", { credentials: 'same-origin' })
     .then((r) => r.json())
     .then((data) => {
         const ctx = document.getElementById('leadsByDayChart');
         if (!ctx || !window.Chart) return;
+        const labels = data.labels;
         new Chart(ctx, {
             type: 'bar',
             data: data,
@@ -72,11 +77,25 @@ fetch("{% url 'client:chart_data' %}", { credentials: 'same-origin' })
                 responsive: true,
                 maintainAspectRatio: false,
                 scales: {
-                    x: { stacked: true, grid: { display: false } },
+                    x: {
+                        stacked: true,
+                        grid: { display: false },
+                        ticks: {
+                            maxRotation: 0,
+                            autoSkip: true,
+                            maxTicksLimit: 8,
+                            callback: function (value) { return labels[value] ? shortDate(labels[value]) : ''; },
+                        },
+                    },
                     y: { stacked: true, beginAtZero: true, ticks: { precision: 0 } },
                 },
                 plugins: {
                     legend: { position: 'bottom', labels: { boxWidth: 12 } },
+                    tooltip: {
+                        callbacks: {
+                            title: (items) => items.length ? fullDate(labels[items[0].dataIndex]) : '',
+                        },
+                    },
                 },
             },
         });

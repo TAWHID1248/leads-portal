@@ -16,6 +16,7 @@ app_name = 'super_admin'
 
 urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
+    path('dashboard/chart-data/', views.dashboard_chart_data, name='dashboard_chart_data'),
 
     # Users
     path('users/', users_views.users_list, name='users_list'),

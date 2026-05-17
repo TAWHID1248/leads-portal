@@ -1,4 +1,4 @@
-from apps.portals.super_admin.views.dashboard import dashboard
+from apps.portals.super_admin.views.dashboard import dashboard, dashboard_chart_data
 from apps.portals.super_admin.views.leads import (
     LeadListView,
     LeadDetailView,
