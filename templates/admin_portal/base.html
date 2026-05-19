@@ -3,36 +3,33 @@
 
 {% block extra_css %}
 <style>
-    :root {
-        --portal-primary: #2563EB;
-        --portal-primary-hover: #1D4ED8;
-    }
+:root {
+    --portal-primary:      #2563EB;
+    --portal-primary-dark: #1D4ED8;
+    --portal-primary-hover:#1D4ED8;
+    --portal-primary-light:#EFF6FF;
+    --portal-primary-soft: #EFF6FF;
+    --portal-primary-alpha:rgba(37,99,235,0.12);
+    --portal-primary-glow: 0 4px 14px rgba(37,99,235,0.28);
+}
 </style>
 {% endblock %}
 
 {% block sidebar %}
-<div class="sidebar-section">Admin</div>
+<div class="sidebar-section">Main</div>
 <a href="/admin/dashboard/" class="sidebar-link{% if request.path == '/admin/dashboard/' %} active{% endif %}">
     <i class="bi bi-speedometer2"></i><span>Dashboard</span>
 </a>
 <a href="/admin/leads/" class="sidebar-link{% if '/admin/leads/' in request.path %} active{% endif %}">
     <i class="bi bi-funnel"></i><span>Leads</span>
 </a>
-<a href="/admin/clients/" class="sidebar-link{% if '/admin/clients/' in request.path %} active{% endif %}">
-    <i class="bi bi-briefcase"></i><span>Clients</span>
-</a>
-<a href="/admin/agents/" class="sidebar-link{% if '/admin/agents/' in request.path %} active{% endif %}">
-    <i class="bi bi-person-badge"></i><span>Agents</span>
-</a>
+
+<div class="sidebar-section">Operations</div>
 <a href="/admin/replacements/" class="sidebar-link{% if '/admin/replacements/' in request.path %} active{% endif %}">
     <i class="bi bi-arrow-repeat"></i><span>Replacements</span>
 </a>
-<a href="/admin/sweepstakes/" class="sidebar-link{% if '/admin/sweepstakes/' in request.path %} active{% endif %}">
-    <i class="bi bi-gift"></i><span>Sweepstakes</span>
-</a>
-<a href="/admin/billing/" class="sidebar-link{% if '/admin/billing/' in request.path %} active{% endif %}">
-    <i class="bi bi-receipt"></i><span>Billing</span>
-</a>
+
+<div class="sidebar-section">Reports</div>
 <a href="/admin/reports/leads/" class="sidebar-link{% if '/admin/reports/' in request.path %} active{% endif %}">
     <i class="bi bi-bar-chart"></i><span>Reports</span>
 </a>

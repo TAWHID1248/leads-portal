@@ -3,24 +3,31 @@
 
 {% block extra_css %}
 <style>
-    :root {
-        --portal-primary: #0F766E;
-        --portal-primary-hover: #115E59;
-    }
+:root {
+    --portal-primary:      #0D9488;
+    --portal-primary-dark: #0F766E;
+    --portal-primary-hover:#0F766E;
+    --portal-primary-light:#F0FDFA;
+    --portal-primary-soft: #F0FDFA;
+    --portal-primary-alpha:rgba(13,148,136,0.12);
+    --portal-primary-glow: 0 4px 14px rgba(13,148,136,0.28);
+}
 </style>
 {% endblock %}
 
 {% block sidebar %}
-<div class="sidebar-section">Agent</div>
+<div class="sidebar-section">My Work</div>
 <a href="/agent/dashboard/" class="sidebar-link{% if request.path == '/agent/dashboard/' %} active{% endif %}">
     <i class="bi bi-speedometer2"></i><span>Dashboard</span>
 </a>
 <a href="/agent/leads/" class="sidebar-link{% if '/agent/leads/' in request.path %} active{% endif %}">
-    <i class="bi bi-funnel"></i><span>Leads</span>
+    <i class="bi bi-funnel"></i><span>My Leads</span>
 </a>
 <a href="/agent/calls/" class="sidebar-link{% if '/agent/calls/' in request.path %} active{% endif %}">
-    <i class="bi bi-telephone"></i><span>Calls</span>
+    <i class="bi bi-telephone"></i><span>Call Log</span>
 </a>
+
+<div class="sidebar-section">Progress</div>
 <a href="/agent/targets/" class="sidebar-link{% if '/agent/targets/' in request.path %} active{% endif %}">
     <i class="bi bi-bullseye"></i><span>Targets</span>
 </a>

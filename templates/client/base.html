@@ -3,23 +3,33 @@
 
 {% block extra_css %}
 <style>
-    :root {
-        --portal-primary: #EA580C;
-        --portal-primary-hover: #C2410C;
-    }
+:root {
+    --portal-primary:      #F97316;
+    --portal-primary-dark: #EA580C;
+    --portal-primary-hover:#EA580C;
+    --portal-primary-light:#FFF7ED;
+    --portal-primary-soft: #FFF7ED;
+    --portal-primary-alpha:rgba(249,115,22,0.12);
+    --portal-primary-glow: 0 4px 14px rgba(249,115,22,0.28);
+}
 </style>
 {% endblock %}
 
 {% block sidebar %}
-<div class="sidebar-section">Client</div>
+<div class="sidebar-section">Overview</div>
 <a href="/client/dashboard/" class="sidebar-link{% if request.path == '/client/dashboard/' %} active{% endif %}">
     <i class="bi bi-speedometer2"></i><span>Dashboard</span>
 </a>
 <a href="/client/leads/" class="sidebar-link{% if '/client/leads/' in request.path %} active{% endif %}">
     <i class="bi bi-funnel"></i><span>My Leads</span>
 </a>
+
+<div class="sidebar-section">Billing</div>
+<a href="/client/wallet/" class="sidebar-link{% if '/client/wallet/' in request.path %} active{% endif %}">
+    <i class="bi bi-wallet2"></i><span>Wallet</span>
+</a>
 <a href="/client/pricing/" class="sidebar-link{% if '/client/pricing/' in request.path %} active{% endif %}">
-    <i class="bi bi-tag"></i><span>Pricing</span>
+    <i class="bi bi-tag"></i><span>Buy Leads</span>
 </a>
 <a href="/client/orders/" class="sidebar-link{% if '/client/orders/' in request.path %} active{% endif %}">
     <i class="bi bi-bag"></i><span>Orders</span>
@@ -27,13 +37,12 @@
 <a href="/client/subscriptions/" class="sidebar-link{% if '/client/subscriptions/' in request.path %} active{% endif %}">
     <i class="bi bi-arrow-repeat"></i><span>Subscriptions</span>
 </a>
-<a href="/client/wallet/" class="sidebar-link{% if '/client/wallet/' in request.path %} active{% endif %}">
-    <i class="bi bi-wallet2"></i><span>Wallet</span>
-</a>
-<a href="/client/replacements/" class="sidebar-link{% if '/client/replacements/' in request.path %} active{% endif %}">
-    <i class="bi bi-arrow-repeat"></i><span>Replacements</span>
-</a>
 <a href="/client/invoices/" class="sidebar-link{% if '/client/invoices/' in request.path %} active{% endif %}">
     <i class="bi bi-receipt"></i><span>Invoices</span>
+</a>
+
+<div class="sidebar-section">Support</div>
+<a href="/client/replacements/" class="sidebar-link{% if '/client/replacements/' in request.path %} active{% endif %}">
+    <i class="bi bi-shield-check"></i><span>Replacements</span>
 </a>
 {% endblock %}

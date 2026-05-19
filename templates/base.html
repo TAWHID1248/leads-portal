@@ -12,94 +12,116 @@
 </head>
 <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
 
-    {% include 'partials/_topbar.html' %}
+<div class="portal-layout">
 
-    <div class="d-flex" style="padding-top: var(--portal-topbar-height);">
-        <nav id="portalSidebar" class="portal-sidebar">
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="portal-sidebar" id="portalSidebar">
+
+        <a href="/" class="sidebar-brand">
+            <div class="sidebar-brand-icon">
+                <i class="bi bi-lightning-charge-fill"></i>
+            </div>
+            <span class="sidebar-brand-name">LeadPortal</span>
+        </a>
+
+        <nav class="sidebar-nav">
             {% block sidebar %}{% endblock %}
         </nav>
 
-        <main class="portal-content flex-grow-1">
+        {% if user.is_authenticated %}
+        <div class="sidebar-bottom">
+            <div class="dropdown dropup">
+                <div class="sidebar-user" data-bs-toggle="dropdown" aria-expanded="false">
+                    <div class="sidebar-user-avatar">
+                        {{ user.first_name|first|default:user.email|first|upper }}
+                    </div>
+                    <div class="flex-grow-1 overflow-hidden">
+                        <div class="sidebar-user-name">{{ user.get_full_name|default:user.email }}</div>
+                        <div class="sidebar-user-role">{{ user.get_role_display }}</div>
+                    </div>
+                    <i class="bi bi-three-dots-vertical" style="font-size:0.75rem;color:#475569;flex-shrink:0;"></i>
+                </div>
+                <ul class="dropdown-menu dropdown-menu-end mb-2" style="min-width:200px;">
+                    <li><span class="dropdown-item-text small text-muted px-3 py-1 d-block text-truncate" style="max-width:200px;">{{ user.email }}</span></li>
+                    <li><span class="dropdown-item-text px-3 py-0">
+                        <span class="badge rounded-pill" style="background:var(--portal-primary);font-size:0.62rem;">{{ user.get_role_display }}</span>
+                    </span></li>
+                    <li><hr class="dropdown-divider my-1"></li>
+                    <li>
+                        <form method="post" action="/logout/">
+                            {% csrf_token %}
+                            <button type="submit" class="dropdown-item text-danger">
+                                <i class="bi bi-box-arrow-right me-2"></i>Sign out
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+
+    </aside>
+
+    <!-- Mobile backdrop -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- ===== MAIN ===== -->
+    <div class="portal-main">
+        {% include 'partials/_topbar.html' %}
+        <main class="portal-content">
             {% block content %}{% endblock %}
         </main>
     </div>
 
-    {% block modals %}{% endblock %}
+</div>
 
-    <div class="toast-container position-fixed bottom-0 end-0 p-3" id="toastContainer" style="z-index: 9999;"></div>
-    {% include 'partials/_toast.html' %}
+{% block modals %}{% endblock %}
 
-    {% if user.is_authenticated %}
-    {# Session-timeout warning: warn at 13min idle, force /logout/ at 15min. #}
-    <div class="modal fade" id="sessionTimeoutModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Are you still there?</h5>
-                </div>
-                <div class="modal-body">
-                    Your session will expire in <strong id="sessionTimeoutCountdown">2:00</strong> for security.
-                    Click to stay signed in.
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" id="sessionTimeoutStay">Stay signed in</button>
-                </div>
+<div class="toast-container position-fixed bottom-0 end-0 p-3" id="toastContainer" style="z-index:9999;"></div>
+{% include 'partials/_toast.html' %}
+
+{% if user.is_authenticated %}
+<div class="modal fade" id="sessionTimeoutModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Still there?</h5>
+            </div>
+            <div class="modal-body small">
+                Session expires in <strong id="sessionTimeoutCountdown">2:00</strong>.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary w-100" id="sessionTimeoutStay">Stay signed in</button>
             </div>
         </div>
     </div>
-    <script>
-    (function () {
-        const WARN_AFTER = 13 * 60 * 1000;
-        const LOGOUT_AFTER = 15 * 60 * 1000;
-        let lastActivity = Date.now();
-        let modalShown = false;
+</div>
+<script>
+(function(){
+    const WARN=13*60000,OUT=15*60000;
+    let last=Date.now(),shown=false;
+    ['mousemove','keydown','click','scroll','touchstart'].forEach(e=>
+        document.addEventListener(e,()=>{last=Date.now();if(shown){const m=bootstrap.Modal.getInstance(document.getElementById('sessionTimeoutModal'));if(m)m.hide();shown=false;}},{passive:true})
+    );
+    document.getElementById('sessionTimeoutStay').addEventListener('click',()=>{
+        last=Date.now();
+        const m=bootstrap.Modal.getInstance(document.getElementById('sessionTimeoutModal'));if(m)m.hide();shown=false;
+        fetch("{% url 'notifications:unread_count' %}",{credentials:'same-origin'});
+    });
+    setInterval(()=>{
+        const idle=Date.now()-last;
+        if(idle>=OUT){window.location.href='/logout/';return;}
+        if(idle>=WARN&&!shown){bootstrap.Modal.getOrCreateInstance(document.getElementById('sessionTimeoutModal')).show();shown=true;}
+        if(shown){const r=Math.max(0,OUT-idle);const el=document.getElementById('sessionTimeoutCountdown');if(el)el.textContent=Math.floor(r/60000)+':'+String(Math.floor((r%60000)/1000)).padStart(2,'0');}
+    },5000);
+})();
+</script>
+{% endif %}
 
-        ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'].forEach((evt) =>
-            document.addEventListener(evt, () => {
-                lastActivity = Date.now();
-                if (modalShown) {
-                    const m = bootstrap.Modal.getInstance(document.getElementById('sessionTimeoutModal'));
-                    if (m) m.hide();
-                    modalShown = false;
-                }
-            }, { passive: true })
-        );
-
-        document.getElementById('sessionTimeoutStay').addEventListener('click', () => {
-            lastActivity = Date.now();
-            const m = bootstrap.Modal.getInstance(document.getElementById('sessionTimeoutModal'));
-            if (m) m.hide();
-            modalShown = false;
-            // Touch the server so the session timestamp updates.
-            fetch("{% url 'notifications:unread_count' %}", { credentials: 'same-origin' });
-        });
-
-        setInterval(() => {
-            const idle = Date.now() - lastActivity;
-            if (idle >= LOGOUT_AFTER) {
-                window.location.href = '/logout/';
-                return;
-            }
-            if (idle >= WARN_AFTER && !modalShown) {
-                const m = bootstrap.Modal.getOrCreateInstance(document.getElementById('sessionTimeoutModal'));
-                m.show();
-                modalShown = true;
-            }
-            if (modalShown) {
-                const remaining = Math.max(0, LOGOUT_AFTER - idle);
-                const m = Math.floor(remaining / 60000);
-                const s = String(Math.floor((remaining % 60000) / 1000)).padStart(2, '0');
-                const el = document.getElementById('sessionTimeoutCountdown');
-                if (el) el.textContent = `${m}:${s}`;
-            }
-        }, 5000);
-    })();
-    </script>
-    {% endif %}
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-    <script src="{% static 'js/portal.js' %}"></script>
-    {% block extra_js %}{% endblock %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/htmx.org@1.9.10"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="{% static 'js/portal.js' %}"></script>
+{% block extra_js %}{% endblock %}
 </body>
 </html>

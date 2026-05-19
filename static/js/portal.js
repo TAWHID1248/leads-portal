@@ -87,18 +87,29 @@
     };
 
     // ---------- Sidebar toggle (mobile) ----------
+    function setSidebarOpen(open) {
+        const sidebar = document.getElementById('portalSidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        if (!sidebar) return;
+        sidebar.classList.toggle('show', open);
+        if (overlay) overlay.classList.toggle('show', open);
+        document.body.style.overflow = open ? 'hidden' : '';
+    }
+
     document.addEventListener('click', function (evt) {
         const toggle = evt.target.closest('#sidebarToggle');
         if (toggle) {
             const sidebar = document.getElementById('portalSidebar');
-            if (sidebar) sidebar.classList.toggle('show');
+            setSidebarOpen(!sidebar.classList.contains('show'));
             return;
         }
-        // Click outside to close on mobile
+        // Click overlay or outside sidebar to close on mobile
+        const overlay = evt.target.closest('#sidebarOverlay');
+        if (overlay) { setSidebarOpen(false); return; }
         if (window.innerWidth < 992) {
             const sidebar = document.getElementById('portalSidebar');
             if (sidebar && sidebar.classList.contains('show') && !evt.target.closest('#portalSidebar')) {
-                sidebar.classList.remove('show');
+                setSidebarOpen(false);
             }
         }
     });

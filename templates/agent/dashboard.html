@@ -1,95 +1,172 @@
 {% extends 'agent/base.html' %}
 {% load portal_tags %}
 
-{% block title %}Agent dashboard | LeadPortal{% endblock %}
+{% block title %}Dashboard | Agent Portal{% endblock %}
 
 {% block content %}
-<h1 class="h3 mb-1">Welcome, {{ user.first_name|default:user.email }}</h1>
-<p class="text-muted small mb-3">Agent · target {{ agent.target_leads }} leads / {{ agent.target_revenue|money }}</p>
 
-<div class="row g-3 mb-4">
-    <div class="col-md col-6"><div class="kpi-card"><div class="kpi-label">Leads assigned</div><div class="kpi-value">{{ kpis.leads_assigned }}</div></div></div>
-    <div class="col-md col-6"><div class="kpi-card"><div class="kpi-label">Calls today</div><div class="kpi-value">{{ kpis.calls_today }}</div></div></div>
-    <div class="col-md col-6"><div class="kpi-card"><div class="kpi-label">Sold this week</div><div class="kpi-value">{{ kpis.sold_this_week }}</div></div></div>
-    <div class="col-md col-6"><div class="kpi-card"><div class="kpi-label">Commission (month)</div><div class="kpi-value">{{ kpis.commission_month|money }}</div></div></div>
+<div class="d-flex align-items-start justify-content-between flex-wrap gap-3 mb-4">
+    <div>
+        <h1 class="page-greeting" id="dashGreeting">Dashboard</h1>
+        <p class="page-date" id="dashDate"></p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'agent:leads_list' %}" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-funnel me-1"></i>My Leads
+        </a>
+        <a href="{% url 'agent:calls' %}" class="btn btn-sm btn-primary">
+            <i class="bi bi-telephone me-1"></i>Log a Call
+        </a>
+    </div>
 </div>
 
+<!-- KPIs -->
+<div class="row g-3 mb-4">
+    <div class="col-xl-3 col-sm-6">
+        <div class="kpi-card">
+            <div class="kpi-card-header">
+                <div class="kpi-icon teal"><i class="bi bi-funnel-fill"></i></div>
+                <span class="kpi-trend neutral">Total</span>
+            </div>
+            <div class="kpi-label">Leads Assigned</div>
+            <div class="kpi-value">{{ kpis.leads_assigned|default:"0" }}</div>
+            <div class="kpi-sub">All time</div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-sm-6">
+        <div class="kpi-card">
+            <div class="kpi-card-header">
+                <div class="kpi-icon blue"><i class="bi bi-telephone-fill"></i></div>
+                <span class="kpi-trend up"><i class="bi bi-arrow-up"></i> Today</span>
+            </div>
+            <div class="kpi-label">Calls Today</div>
+            <div class="kpi-value">{{ kpis.calls_today|default:"0" }}</div>
+            <div class="kpi-sub">Logged today</div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-sm-6">
+        <div class="kpi-card">
+            <div class="kpi-card-header">
+                <div class="kpi-icon green"><i class="bi bi-check-circle-fill"></i></div>
+                <span class="kpi-trend up"><i class="bi bi-arrow-up"></i> This week</span>
+            </div>
+            <div class="kpi-label">Sold This Week</div>
+            <div class="kpi-value">{{ kpis.sold_this_week|default:"0" }}</div>
+            <div class="kpi-sub">Conversions</div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-sm-6">
+        <div class="kpi-card">
+            <div class="kpi-card-header">
+                <div class="kpi-icon purple"><i class="bi bi-coin"></i></div>
+                <span class="kpi-trend neutral">This month</span>
+            </div>
+            <div class="kpi-label">Commission (Month)</div>
+            <div class="kpi-value">{{ kpis.commission_month|money }}</div>
+            <div class="kpi-sub">Estimated earnings</div>
+        </div>
+    </div>
+</div>
+
+<!-- Targets + Chart + Activity -->
 <div class="row g-3">
-    <div class="col-lg-6">
-        <div class="card">
+    <div class="col-lg-5">
+        <div class="card mb-3">
             <div class="card-body">
-                <h6 class="mb-3">Weekly targets</h6>
-                <div class="mb-2 small text-muted">
-                    Leads: <strong>{{ target_progress.leads_done }}</strong> / {{ target_progress.leads_target }}
+                <div class="card-title mb-3">Weekly Targets</div>
+
+                <div class="d-flex justify-content-between mb-1">
+                    <span class="fs-sm text-muted">Leads</span>
+                    <span class="fs-sm fw-semibold">{{ target_progress.leads_done }} / {{ target_progress.leads_target }}</span>
                 </div>
-                <div class="progress mb-3" style="height: 12px;">
+                <div class="progress mb-3">
                     <div class="progress-bar" role="progressbar"
-                         style="width: {% widthratio target_progress.leads_done target_progress.leads_target 100 %}%;">
-                    </div>
+                         style="width: {% widthratio target_progress.leads_done target_progress.leads_target 100 %}%"></div>
                 </div>
-                <div class="mb-2 small text-muted">
-                    Revenue: <strong>{{ target_progress.revenue_done|money }}</strong> / {{ target_progress.revenue_target|money }}
+
+                <div class="d-flex justify-content-between mb-1">
+                    <span class="fs-sm text-muted">Revenue</span>
+                    <span class="fs-sm fw-semibold">{{ target_progress.revenue_done|money }} / {{ target_progress.revenue_target|money }}</span>
                 </div>
-                <div class="progress mb-3" style="height: 12px;">
+                <div class="progress mb-3">
                     <div class="progress-bar bg-success" role="progressbar"
-                         style="width: {% widthratio target_progress.revenue_done target_progress.revenue_target 100 %}%;">
-                    </div>
+                         style="width: {% widthratio target_progress.revenue_done target_progress.revenue_target 100 %}%"></div>
                 </div>
-                <p class="small text-muted mb-0">{{ target_progress.days_remaining_in_week }} days remaining this week</p>
+
+                <p class="fs-xs text-muted mb-0">
+                    <i class="bi bi-clock me-1"></i>{{ target_progress.days_remaining_in_week }} days remaining this week
+                </p>
             </div>
         </div>
-        <div class="card mt-3">
+
+        <div class="card">
             <div class="card-body">
-                <h6 class="mb-3">Calls today by outcome</h6>
-                <div style="position: relative; height: 240px;">
+                <div class="card-title mb-1">Today's Calls</div>
+                <div class="card-subtitle mb-3">By outcome</div>
+                <div class="chart-container-sm">
                     <canvas id="callsTodayChart"></canvas>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-lg-6">
-        <div class="card">
+
+    <div class="col-lg-7">
+        <div class="card h-100">
             <div class="card-body">
-                <h6 class="mb-3">Recent activity</h6>
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <div>
+                        <div class="card-title">Recent Activity</div>
+                        <div class="card-subtitle">Calls & assignments</div>
+                    </div>
+                    <a href="{% url 'agent:calls' %}" class="btn btn-sm btn-outline-secondary">View all</a>
+                </div>
+
                 {% if activity %}
-                <ul class="list-unstyled mb-0">
+                <div>
                     {% for a in activity %}
-                    <li class="border-start ps-3 mb-3" style="border-color: var(--portal-primary) !important;">
-                        <div class="small fw-semibold">{{ a.verb }} — {{ a.detail }}</div>
-                        <div class="small text-muted">
-                            {{ a.lead.full_name|default:a.lead.email|default:'(no name)' }}
-                            · {{ a.when|time_ago }}
+                    <div class="activity-item">
+                        <div class="activity-dot {% if a.kind == 'call' %}blue{% else %}green{% endif %}"></div>
+                        <div class="flex-grow-1 min-width-0">
+                            <div class="activity-title">{{ a.verb }} — {{ a.detail }}</div>
+                            <div class="activity-meta">
+                                {{ a.lead.full_name|default:a.lead.email|default:'Unknown' }}
+                                · {{ a.when|time_ago }}
+                            </div>
                         </div>
-                    </li>
+                    </div>
                     {% endfor %}
-                </ul>
+                </div>
                 {% else %}
-                {% include 'partials/_empty_state.html' with title="No recent activity" %}
+                <div class="empty-state">
+                    <div class="empty-state-icon"><i class="bi bi-activity"></i></div>
+                    <div class="empty-state-title">No activity yet</div>
+                    <div class="empty-state-desc">Log calls to see your activity feed.</div>
+                </div>
                 {% endif %}
             </div>
         </div>
     </div>
 </div>
+
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
-fetch("{% url 'agent:chart_data' %}", {credentials: 'same-origin'})
-    .then(r => r.json())
-    .then(data => {
-        const el = document.getElementById('callsTodayChart');
-        if (!el || !window.Chart) return;
-        new Chart(el, {
-            type: 'doughnut',
-            data,
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { position: 'bottom', labels: {boxWidth: 12} } },
-            },
-        });
-    })
-    .catch(() => {});
+(function(){
+    const h=new Date().getHours(), name="{{ user.first_name|default:'there'|escapejs }}";
+    const g=h<12?'Good morning':h<17?'Good afternoon':'Good evening';
+    document.getElementById('dashGreeting').textContent=g+', '+name+'!';
+    document.getElementById('dashDate').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+})();
+
+fetch("{% url 'agent:chart_data' %}",{credentials:'same-origin'}).then(r=>r.json()).then(data=>{
+    const el=document.getElementById('callsTodayChart');
+    if(!el||!window.Chart) return;
+    new Chart(el,{type:'doughnut',data,options:{
+        responsive:true,maintainAspectRatio:false,cutout:'68%',
+        plugins:{legend:{position:'bottom',labels:{boxWidth:10,padding:12,font:{size:11}}},
+                 tooltip:{backgroundColor:'#0F172A',titleColor:'#E2E8F0',bodyColor:'#94A3B8',padding:10,cornerRadius:8}},
+    }});
+}).catch(()=>{});
 </script>
 {% endblock %}
