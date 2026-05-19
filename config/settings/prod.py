@@ -17,10 +17,11 @@ from .base import *  # noqa: F401,F403
 
 DEBUG = False
 
-# Railway injects RAILWAY_PUBLIC_DOMAIN automatically — use it as the fallback
-# so ALLOWED_HOSTS doesn't need to be set manually.
+# Railway injects RAILWAY_PUBLIC_DOMAIN automatically. Also allow
+# healthcheck.railway.app which Railway's internal health checker uses.
 _railway_domain = os.environ.get('RAILWAY_PUBLIC_DOMAIN', '')
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default=_railway_domain, cast=Csv())
+_default_hosts = ','.join(filter(None, [_railway_domain, '.railway.app']))
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default=_default_hosts, cast=Csv())
 
 # ---------- Database ----------
 DATABASES = {
@@ -46,7 +47,7 @@ SECURE_REFERRER_POLICY = 'same-origin'
 
 # ---------- CSRF / CORS trusted origins ----------
 # CSRF_TRUSTED_ORIGINS=https://portal.example.com,https://leads.example.com
-_railway_origin = f'https://{_railway_domain}' if _railway_domain else ''
+_railway_origin = f'https://{_railway_domain}' if _railway_domain else 'https://*.railway.app'
 CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default=_railway_origin, cast=Csv())
 
 # ---------- Static files (WhiteNoise) ----------
