@@ -7,6 +7,8 @@ Everything that differs from base.py is wired here; we never override the
 base middleware list silently — we splice WhiteNoise in.
 """
 
+import os
+
 import dj_database_url
 from decouple import Csv, config
 
@@ -15,7 +17,10 @@ from .base import *  # noqa: F401,F403
 
 DEBUG = False
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
+# Railway injects RAILWAY_PUBLIC_DOMAIN automatically — use it as the fallback
+# so ALLOWED_HOSTS doesn't need to be set manually.
+_railway_domain = os.environ.get('RAILWAY_PUBLIC_DOMAIN', '')
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default=_railway_domain, cast=Csv())
 
 # ---------- Database ----------
 DATABASES = {
@@ -41,7 +46,8 @@ SECURE_REFERRER_POLICY = 'same-origin'
 
 # ---------- CSRF / CORS trusted origins ----------
 # CSRF_TRUSTED_ORIGINS=https://portal.example.com,https://leads.example.com
-CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='', cast=Csv())
+_railway_origin = f'https://{_railway_domain}' if _railway_domain else ''
+CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default=_railway_origin, cast=Csv())
 
 # ---------- Static files (WhiteNoise) ----------
 # Splice WhiteNoise immediately after SecurityMiddleware so it can serve
