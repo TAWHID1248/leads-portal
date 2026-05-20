@@ -41,11 +41,4 @@ from apps.portals.super_admin.views.replacements import (
 )
 from apps.portals.super_admin.views.users import users_list
 from apps.portals.super_admin.views.billing import billing_overview
-from apps.portals.super_admin.views.groups import (
-    facebook_groups_list,
-    facebook_group_create,
-    facebook_group_edit,
-    facebook_group_delete,
-)
-
 leads_list = LeadListView  # back-compat
