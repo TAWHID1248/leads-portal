@@ -5,7 +5,7 @@
     "buildCommand": "pip install -r requirements.txt && SECRET_KEY=build-placeholder ALLOWED_HOSTS=localhost DJANGO_SETTINGS_MODULE=config.settings.prod python manage.py collectstatic --noinput"
   },
   "deploy": {
-    "startCommand": "python manage.py migrate --noinput && gunicorn config.wsgi --bind 0.0.0.0:$PORT --workers 3 --access-logfile - --error-logfile -",
+    "startCommand": "python manage.py migrate --noinput && python manage.py seed_facebook_groups && gunicorn config.wsgi --bind 0.0.0.0:$PORT --workers 3 --access-logfile - --error-logfile -",
     "healthcheckPath": "/healthz/",
     "healthcheckTimeout": 30,
     "restartPolicyType": "ON_FAILURE",
