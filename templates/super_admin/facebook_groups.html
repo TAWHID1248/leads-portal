@@ -1,0 +1,107 @@
+{% extends 'super_admin/base.html' %}
+{% load portal_tags %}
+
+{% block title %}Facebook Groups | LeadPortal{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-start justify-content-between flex-wrap gap-3 mb-4">
+    <div>
+        <h1 class="page-title mb-0">Facebook Groups</h1>
+        <p class="text-muted fs-sm mb-0">{{ total }} group{{ total|pluralize }}</p>
+    </div>
+    <a href="{% url 'super_admin:facebook_group_create' %}" class="btn btn-primary btn-sm">
+        <i class="bi bi-plus-lg me-1"></i>Add Group
+    </a>
+</div>
+
+<form method="get" class="mb-4">
+    <div class="input-group" style="max-width:420px;">
+        <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+        <input type="text" name="q" value="{{ q }}" class="form-control border-start-0 ps-0" placeholder="Search groups..." autocomplete="off">
+        {% if q %}<a href="{% url 'super_admin:facebook_groups' %}" class="btn btn-outline-secondary">Clear</a>{% endif %}
+    </div>
+</form>
+
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+    {{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+{% endfor %}
+{% endif %}
+
+<div class="card">
+    <div class="card-table">
+        {% if groups %}
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Group Name</th>
+                    <th>Type</th>
+                    <th>Members</th>
+                    <th>Condition</th>
+                    <th>Owner</th>
+                    <th>Admins</th>
+                    <th>Agent</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for g in groups %}
+                <tr>
+                    <td style="max-width:260px;">
+                        <div class="fw-semibold fs-sm d-flex align-items-center gap-1">
+                            {% if g.group_url %}<a href="{{ g.group_url }}" target="_blank" rel="noopener" class="text-decoration-none text-body">{{ g.name }}</a><a href="{{ g.group_url }}" target="_blank" rel="noopener" class="text-muted"><i class="bi bi-box-arrow-up-right" style="font-size:0.7rem;"></i></a>
+                            {% else %}{{ g.name }}{% endif %}
+                        </div>
+                        {% if g.backup_url %}
+                        <div class="fs-xs text-muted d-flex align-items-center gap-1 mt-1">
+                            <span class="badge bg-light text-secondary border" style="font-size:0.65rem;">Backup</span>
+                            <a href="{{ g.backup_url }}" target="_blank" rel="noopener" class="text-muted text-decoration-none">
+                                <i class="bi bi-box-arrow-up-right" style="font-size:0.65rem;"></i> link
+                            </a>
+                        </div>
+                        {% endif %}
+                    </td>
+                    <td class="text-muted fs-sm">{{ g.get_group_type_display }}</td>
+                    <td class="fw-semibold fs-sm">{{ g.members|default:"—" }}</td>
+                    <td>
+                        <div class="fs-xs fw-semibold {% if g.is_active %}text-success{% else %}text-danger{% endif %}">{% if g.is_active %}Active{% else %}Inactive{% endif %}</div>
+                        <div class="fs-xs fw-semibold
+                            {% if g.quality == 'very_good' or g.quality == 'good' %}text-success
+                            {% elif g.quality == 'average' %}text-warning
+                            {% elif g.quality == 'below_average' %}text-warning
+                            {% elif g.quality == 'bad' %}text-danger
+                            {% else %}text-danger{% endif %}">{{ g.get_quality_display }}</div>
+                    </td>
+                    <td class="fs-sm">
+                        {% if g.owner_name %}{% if g.owner_url %}<a href="{{ g.owner_url }}" target="_blank" rel="noopener" class="text-decoration-none text-body d-flex align-items-center gap-1">{{ g.owner_name }}<i class="bi bi-box-arrow-up-right text-muted" style="font-size:0.65rem;"></i></a>{% else %}{{ g.owner_name }}{% endif %}{% else %}—{% endif %}
+                    </td>
+                    <td style="max-width:200px;">
+                        {% if g.admin_1 %}<span class="badge bg-light text-dark border me-1 mb-1 fs-xs">{{ g.admin_1 }}</span>{% endif %}
+                        {% if g.admin_2 %}<span class="badge bg-light text-dark border me-1 mb-1 fs-xs">{{ g.admin_2 }}</span>{% endif %}
+                        {% if g.admin_3 %}<span class="badge bg-light text-dark border me-1 mb-1 fs-xs">{{ g.admin_3 }}</span>{% endif %}
+                        {% if not g.admin_1 %}—{% endif %}
+                    </td>
+                    <td class="text-muted fs-sm">{{ g.agent_name|default:"—" }}</td>
+                    <td class="text-end">
+                        <a href="{% url 'super_admin:facebook_group_edit' g.pk %}" class="btn btn-xs btn-outline-secondary me-1"><i class="bi bi-pencil"></i></a>
+                        <form method="post" action="{% url 'super_admin:facebook_group_delete' g.pk %}" class="d-inline" onsubmit="return confirm('Delete {{ g.name|escapejs }}?')">
+                            {% csrf_token %}
+                            <button class="btn btn-xs btn-outline-danger"><i class="bi bi-trash"></i></button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state py-5">
+            <div class="empty-state-icon"><i class="bi bi-people"></i></div>
+            <div class="empty-state-title">No groups found</div>
+            <div class="empty-state-desc">{% if q %}No results for "{{ q }}"{% else %}Click "Add Group" to get started.{% endif %}</div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

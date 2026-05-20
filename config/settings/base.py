@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     'apps.agents',
     'apps.sweepstakes',
     'apps.notifications',
+    'apps.groups',
     'apps.portals',
     'apps.portals.super_admin',
     'apps.portals.admin_portal',

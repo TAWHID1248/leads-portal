@@ -64,6 +64,12 @@ urlpatterns = [
     path('replacements/<int:pk>/approve/', replacements_views.approve_replacement_view, name='replacement_approve'),
     path('replacements/<int:pk>/deny/', replacements_views.deny_replacement_view, name='replacement_deny'),
 
+    # Facebook Groups
+    path('facebook-groups/', views.facebook_groups_list, name='facebook_groups'),
+    path('facebook-groups/new/', views.facebook_group_create, name='facebook_group_create'),
+    path('facebook-groups/<int:pk>/edit/', views.facebook_group_edit, name='facebook_group_edit'),
+    path('facebook-groups/<int:pk>/delete/', views.facebook_group_delete, name='facebook_group_delete'),
+
     # Sweepstakes
     path('sweepstakes/', sweepstakes_views.SweepstakesListView, name='sweepstakes_list'),
     path('sweepstakes/new/', sweepstakes_views.SweepstakesCreateView, name='sweepstakes_create'),
