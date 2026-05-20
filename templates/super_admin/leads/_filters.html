@@ -2,7 +2,7 @@
 <form id="leadsFilterForm"
       class="card p-3 mb-3"
       style="position: sticky; top: 60px; z-index: 1010;"
-      hx-get="{% url 'super_admin:leads_list' %}"
+      hx-get="{% if list_url %}{{ list_url }}{% else %}{% url 'super_admin:leads_list' %}{% endif %}"
       hx-target="#leads-table"
       hx-swap="innerHTML"
       hx-push-url="true"
@@ -35,7 +35,7 @@
             {{ filter.form.quality_max }}
         </div>
         <div class="col-md-2 d-flex gap-2">
-            <a href="{% url 'super_admin:leads_list' %}" class="btn btn-sm btn-outline-secondary w-100">Clear</a>
+            <a href="{% if list_url %}{{ list_url }}{% else %}{% url 'super_admin:leads_list' %}{% endif %}" class="btn btn-sm btn-outline-secondary w-100">Clear</a>
         </div>
     </div>
     <div class="row g-2 align-items-end mt-1">

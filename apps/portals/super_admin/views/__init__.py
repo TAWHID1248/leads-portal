@@ -8,6 +8,7 @@ from apps.portals.super_admin.views.leads import (
     bulk_assign_view,
     bulk_export_view,
     bulk_reject_view,
+    niche_leads_view,
 )
 from apps.portals.super_admin.views.clients import (
     ClientListView,

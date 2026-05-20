@@ -26,6 +26,10 @@ urlpatterns = [
 
     # Leads
     path('leads/', leads_views.LeadListView, name='leads_list'),
+    path('leads/sweepstakes/', leads_views.niche_leads_view, {'category': 'sweepstakes'}, name='leads_sweepstakes'),
+    path('leads/solar/', leads_views.niche_leads_view, {'category': 'solar'}, name='leads_solar'),
+    path('leads/homeowner/', leads_views.niche_leads_view, {'category': 'homeowner'}, name='leads_homeowner'),
+    path('leads/payday/', leads_views.niche_leads_view, {'category': 'payday'}, name='leads_payday'),
     path('leads/bulk-assign/', leads_views.bulk_assign_view, name='leads_bulk_assign'),
     path('leads/bulk-export/', leads_views.bulk_export_view, name='leads_bulk_export'),
     path('leads/bulk-reject/', leads_views.bulk_reject_view, name='leads_bulk_reject'),

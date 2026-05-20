@@ -25,6 +25,33 @@ from apps.portals.super_admin.filters import LeadFilter
 
 PAGE_SIZE = 50
 
+NICHE_CATEGORIES = {
+    'sweepstakes': {
+        'title': 'Sweepstakes Leads',
+        'prefix': 'sweeps-',
+        'icon': 'bi-gift',
+        'url_name': 'leads_sweepstakes',
+    },
+    'solar': {
+        'title': 'Solar Leads',
+        'prefix': 'solar-',
+        'icon': 'bi-sun',
+        'url_name': 'leads_solar',
+    },
+    'homeowner': {
+        'title': 'Homeowner Leads',
+        'prefix': 'homeowner-',
+        'icon': 'bi-house',
+        'url_name': 'leads_homeowner',
+    },
+    'payday': {
+        'title': 'Payday Leads',
+        'prefix': 'payday-',
+        'icon': 'bi-cash-coin',
+        'url_name': 'leads_payday',
+    },
+}
+
 
 def _is_htmx(request):
     return request.headers.get('HX-Request') == 'true'
@@ -34,8 +61,9 @@ def _base_qs():
     return Lead.objects.order_by('-created_at')
 
 
-def _filtered_page(request):
-    flt = LeadFilter(request.GET or None, queryset=_base_qs())
+def _filtered_page(request, queryset=None):
+    qs = queryset if queryset is not None else _base_qs()
+    flt = LeadFilter(request.GET or None, queryset=qs)
     page = Paginator(flt.qs, PAGE_SIZE).get_page(request.GET.get('page'))
     return flt, page
 
@@ -43,16 +71,43 @@ def _filtered_page(request):
 @super_admin_required
 def LeadListView(request):
     flt, page = _filtered_page(request)
+    list_url = reverse('super_admin:leads_list')
     ctx = {
         'page_title': 'Leads',
         'filter': flt,
         'page_obj': page,
         'total_count': flt.qs.count(),
+        'list_url': list_url,
+        'niche_categories': NICHE_CATEGORIES,
     }
     if _is_htmx(request):
         return render(request, 'super_admin/leads/_table.html', ctx)
     ctx['clients'] = Client.objects.select_related('user').order_by('company_name')
     return render(request, 'super_admin/leads/list.html', ctx)
+
+
+@super_admin_required
+def niche_leads_view(request, category):
+    from django.http import Http404
+    cat = NICHE_CATEGORIES.get(category)
+    if not cat:
+        raise Http404
+    base_qs = Lead.objects.filter(niche__startswith=cat['prefix']).order_by('-created_at')
+    flt, page = _filtered_page(request, queryset=base_qs)
+    list_url = reverse(f"super_admin:{cat['url_name']}")
+    ctx = {
+        'page_title': cat['title'],
+        'filter': flt,
+        'page_obj': page,
+        'total_count': flt.qs.count(),
+        'list_url': list_url,
+        'niche_category': category,
+        'niche_categories': NICHE_CATEGORIES,
+    }
+    if _is_htmx(request):
+        return render(request, 'super_admin/leads/_table.html', ctx)
+    ctx['clients'] = Client.objects.select_related('user').order_by('company_name')
+    return render(request, 'super_admin/leads/niche_list.html', ctx)
 
 
 @super_admin_required

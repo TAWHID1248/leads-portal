@@ -14,6 +14,14 @@ class Niche(models.TextChoices):
     SWEEPS_LIFE = 'sweeps-life', 'Sweepstakes Life'
     SWEEPS_DEBT = 'sweeps-debt', 'Sweepstakes Debt'
     SWEEPS_GENERIC = 'sweeps-generic', 'Sweepstakes Generic'
+    HOMEOWNER_USA = 'homeowner-usa', 'Homeowner USA'
+    HOMEOWNER_UK = 'homeowner-uk', 'Homeowner UK'
+    HOMEOWNER_CA = 'homeowner-ca', 'Homeowner Canada'
+    HOMEOWNER_AU = 'homeowner-au', 'Homeowner Australia'
+    PAYDAY_USA = 'payday-usa', 'Payday USA'
+    PAYDAY_UK = 'payday-uk', 'Payday UK'
+    PAYDAY_CA = 'payday-ca', 'Payday Canada'
+    PAYDAY_AU = 'payday-au', 'Payday Australia'
 
 
 class Lead(TimeStampedModel):

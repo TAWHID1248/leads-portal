@@ -20,8 +20,20 @@
 <a href="/super/dashboard/" class="sidebar-link{% if request.path == '/super/dashboard/' %} active{% endif %}">
     <i class="bi bi-speedometer2"></i><span>Dashboard</span>
 </a>
-<a href="/super/leads/" class="sidebar-link{% if '/super/leads/' in request.path %} active{% endif %}">
+<a href="/super/leads/" class="sidebar-link{% if request.path == '/super/leads/' %} active{% endif %}">
     <i class="bi bi-funnel"></i><span>Leads</span>
+</a>
+<a href="/super/leads/sweepstakes/" class="sidebar-link sidebar-sublink{% if '/super/leads/sweepstakes/' in request.path %} active{% endif %}">
+    <i class="bi bi-gift"></i><span>Sweepstakes</span>
+</a>
+<a href="/super/leads/solar/" class="sidebar-link sidebar-sublink{% if '/super/leads/solar/' in request.path %} active{% endif %}">
+    <i class="bi bi-sun"></i><span>Solar</span>
+</a>
+<a href="/super/leads/homeowner/" class="sidebar-link sidebar-sublink{% if '/super/leads/homeowner/' in request.path %} active{% endif %}">
+    <i class="bi bi-house"></i><span>Homeowner</span>
+</a>
+<a href="/super/leads/payday/" class="sidebar-link sidebar-sublink{% if '/super/leads/payday/' in request.path %} active{% endif %}">
+    <i class="bi bi-cash-coin"></i><span>Payday</span>
 </a>
 <a href="/super/clients/" class="sidebar-link{% if '/super/clients/' in request.path %} active{% endif %}">
     <i class="bi bi-briefcase"></i><span>Clients</span>
